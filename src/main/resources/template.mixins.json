@@ -1,0 +1,11 @@
+{
+    "required": true,
+    "package": "xyz.deftu.template.mixins",
+    "compatibilityLevel": "JAVA_16",
+    "injectors": {
+        "defaultRequire": 1
+    },
+    "mixins": [],
+    "client": [],
+    "server": []
+}

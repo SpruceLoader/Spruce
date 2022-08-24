@@ -1,0 +1,44 @@
+{
+    "schemaVersion": 1,
+    "id": "${mod_id}",
+    "version": "${mod_version}",
+    "name": "${mod_name}",
+    "description": "I'm a template mod!",
+    "authors": [
+        "Template Guy"
+    ],
+    "contributors": [
+        "Template Contributor"
+    ],
+    "contact": {
+        "homepage": "...",
+        "issues": "...",
+        "sources": "..."
+    },
+    "license": "LGPL 3.0",
+    "environment": "*",
+    "entrypoints": {
+        "client": [
+            {
+                "adapter": "kotlin",
+                "value": "xyz.deftu.template.client.TemplateModClient"
+            }
+        ],
+        "main": [
+            {
+                "adapter": "kotlin",
+                "value": "xyz.deftu.template.TemplateMod"
+            }
+        ]
+    },
+    "mixins": [
+        "${mod_id}.mixins.json"
+    ],
+    "depends": {
+        "fabric-api": "*",
+        "fabricloader": ">=0.14.9",
+        "fabric-language-kotlin": "*",
+        "minecraft": "~${mc_version}",
+        "java": ">=16"
+    }
+}
