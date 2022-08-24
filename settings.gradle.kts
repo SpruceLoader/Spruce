@@ -36,6 +36,8 @@ val projectName: String = extra["mod.name"]?.toString()
 rootProject.name = projectName
 rootProject.buildFileName = "build.gradle.kts"
 
+include(":loader")
+
 listOf(
     "1.18.2-fabric",
     "1.19.2-fabric"

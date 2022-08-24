@@ -24,19 +24,7 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
-
-    modImplementation("net.fabricmc.fabric-api:fabric-api:${when (mcData.version) {
-        11902 -> "0.57.0+1.19"
-        11802 -> "0.57.0+1.18.2"
-        else -> throw IllegalStateException("Invalid MC version: ${mcData.version}")
-    }}")
-    modImplementation("net.fabricmc:fabric-language-kotlin:1.8.2+kotlin.1.7.10")
-
-    modImplementation("com.terraformersmc:modmenu:${when (mcData.version) {
-        11902 -> "4.0.4"
-        11802 -> "3.2.3"
-        else -> throw IllegalStateException("Invalid MC version: ${mcData.version}")
-    }}")
+    implementation("xyz.unifycraft:UEventBus:1.0.0")
 }
 
 tasks {
