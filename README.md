@@ -1,23 +1,11 @@
 <div align="center">
 
-# [`Fabric Mod Template`]
-A project template for modding Minecraft
-with Fabric.
-
+# UniLoader - The loader that makes a difference
 </div>
+UniLoader is a modloader which overlooks how Minecraft modding has been done in the past, and pretty much reinvents the wheel. You'll see more info here as we progress with the project
 
-## I don't know what I'm doing, can you help?!
-Please read the [Fabric wiki][fwiki] before
-coming to one of my communities for modding
-support.
+## What is this? Where am I?
+You've found UniLoader's GitHub page! This is where we keep the source code for UniLoader
 
-<div align="center">
-
-**This project is licensed under [LGPL-3.0][lgpl]**\
-**&copy; 2022 Deftu**
-
-</div>
-
-[lgpl]: https://www.gnu.org/licenses/lgpl-3.0.en.html
-
-[fwiki]: https://fabricmc.net/wiki
+## How do I run it?
+Currently, UniLoader is very WIP and cannot be used. We'll update this page as soon as things change.
