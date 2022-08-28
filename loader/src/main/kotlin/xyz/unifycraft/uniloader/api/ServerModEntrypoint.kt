@@ -8,7 +8,7 @@ package xyz.unifycraft.uniloader.api
  * This entrypoint is defined with the `server`
  * key in your mod's `mod.metadata.json` file.
  *
+ * @see CommonModEntrypoint
  * @see ClientModEntrypoint
- * @see ServerModEntrypoint
  */
 interface ServerModEntrypoint : CommonModEntrypoint

@@ -1,6 +1,8 @@
 package xyz.unifycraft.uniloader.loader
 
 import xyz.unifycraft.uniloader.loader.impl.UniLoaderImpl
+import xyz.unifycraft.uniloader.loader.impl.loading.ModClassLoader
+import xyz.unifycraft.uniloader.utils.AbstractionHelper
 import java.io.File
 
 interface UniLoader {
@@ -8,24 +10,20 @@ interface UniLoader {
     fun isModLoaded(id: String): Boolean
     fun isDevelopmentEnvironment(): Boolean
 
-    fun getGameDir(): File
+    fun getDataDir(): File
     fun getConfigDir(): File
     fun getModsDir(): File
 
-    fun setBridge(bridge: MinecraftBridge)
+    fun getClassLoader(): ModClassLoader
+    fun setClassLoader(classLoader: ModClassLoader)
 
     companion object {
         private lateinit var instance: UniLoader
 
         @JvmStatic
         fun getInstance(): UniLoader {
-            if (!::instance.isInitialized) {
-                val className = System.getProperty("uniloader.class", System.getenv("UNILOADER_CLASS"))
-                instance = if (className != null) {
-                    val clz = Class.forName(className)
-                    clz.getConstructor().newInstance() as UniLoader
-                } else UniLoaderImpl()
-            }
+            if (!::instance.isInitialized) instance =
+                AbstractionHelper.create(UniLoaderImpl::class.java, "uniloader.loader", true)
             return instance
         }
     }

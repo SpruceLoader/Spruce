@@ -5,6 +5,7 @@ import net.minecraft.launchwrapper.Launch
 import net.minecraft.launchwrapper.LaunchClassLoader
 import org.spongepowered.asm.launch.MixinBootstrap
 import org.spongepowered.asm.mixin.MixinEnvironment
+import xyz.unifycraft.uniloader.loader.MinecraftBridge
 import xyz.unifycraft.uniloader.loader.UniLoader
 import java.io.File
 import java.nio.file.Files
@@ -20,19 +21,8 @@ abstract class UniLoaderTweaker : ITweaker {
     abstract override fun getLaunchTarget(): String
     abstract fun getEnvironment(): Environment
 
-    override fun acceptOptions(args: MutableList<String>, gameDir: File, assetsDir: File, profile: String) {
-        for (arg in args) {
-            val index = args.indexOf(arg)
-            if (arg.startsWith("--")) {
-                var shouldContinue = false
-                var value = args.get(index + 1)
-                if (value.startsWith("--")) { // This is an empty arg
-                    value = ""
-                } else shouldContinue = true
-                launchArgs[arg.substring(2)] = value
-                if (shouldContinue) continue
-            }
-        }
+    override fun acceptOptions(args: MutableList<String>, gameDir: File?, assetsDir: File?, profile: String?) {
+
     }
 
     override fun injectIntoClassLoader(classLoader: LaunchClassLoader) {
@@ -42,14 +32,20 @@ abstract class UniLoaderTweaker : ITweaker {
             classPath.add(path)
         }
 
-        val bridge = MinecraftBridgeImpl(launchArgs)
-        UniLoader.getInstance().setBridge(bridge)
+        val bridge = MinecraftBridge.getInstance()
+        //bridge.setLaunchArgs(launchArgs)
 
-        MixinBootstrap.init()
         MixinEnvironment.getDefaultEnvironment().side =
             if (getEnvironment() == Environment.CLIENT) MixinEnvironment.Side.CLIENT else MixinEnvironment.Side.SERVER
     }
 
-    override fun getLaunchArguments() =
-        if (isPrimaryTweaker) arrayOf<String>() else arrayOf<String>()
+    override fun getLaunchArguments(): Array<String> =
+        if (isPrimaryTweaker) run {
+            val value = mutableListOf<String>()
+            launchArgs.forEach { (name, key) ->
+                value.add(name)
+                value.add(key)
+            }
+            value.toTypedArray()
+        } else arrayOf()
 }

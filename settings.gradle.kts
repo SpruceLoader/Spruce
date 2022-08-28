@@ -24,27 +24,13 @@ pluginManagement {
     plugins {
         val kotlin = "1.6.21"
         kotlin("jvm") version(kotlin)
-        kotlin("plugin.serialization") version(kotlin)
-
-        val ucgt = "1.11.0"
-        id("xyz.unifycraft.gradle.multiversion-root") version(ucgt)
     }
 }
 
-val projectName: String = extra["mod.name"]?.toString()
-    ?: throw MissingPropertyException("mod.name has not been set.")
+val projectName: String = extra["project.name"]?.toString()
+    ?: throw MissingPropertyException("Project name was not set!")
 rootProject.name = projectName
-rootProject.buildFileName = "build.gradle.kts"
 
 include(":loader")
-
-listOf(
-    "1.18.2-fabric",
-    "1.19.2-fabric"
-).forEach { version ->
-    include(":$version")
-    project(":$version").apply {
-        projectDir = file("versions/$version")
-        buildFileName = "../../version.gradle.kts"
-    }
-}
+include(":api")
+include(":impl")
