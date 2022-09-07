@@ -31,6 +31,9 @@ val projectName: String = extra["project.name"]?.toString()
     ?: throw MissingPropertyException("Project name was not set!")
 rootProject.name = projectName
 
+// Next, we need to load all available mods
 include(":loader")
+// We also provide an in-depth API alongside our loader
 include(":api")
+// Here we implement the classes in our API
 include(":impl")

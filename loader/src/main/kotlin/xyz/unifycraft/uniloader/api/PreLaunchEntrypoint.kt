@@ -1,6 +1,6 @@
 package xyz.unifycraft.uniloader.api
 
-import xyz.unifycraft.uniloader.loader.ArgumentMap
+import xyz.unifycraft.launchwrapper.api.ArgumentMap
 
 /**
  * An entrypoint interface which allows mods to
@@ -16,6 +16,6 @@ import xyz.unifycraft.uniloader.loader.ArgumentMap
  * @see ClientModEntrypoint
  * @see ServerModEntrypoint
  */
-interface PreLaunchEntrypoint {
-    fun initialize(arguments: ArgumentMap, classLoader: ClassLoader)
+interface PreLaunchEntrypoint : Entrypoint {
+    fun initialize(arguments: ArgumentMap)
 }

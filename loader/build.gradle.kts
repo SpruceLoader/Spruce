@@ -6,19 +6,15 @@ plugins {
 repositories {
     mavenCentral()
     maven("https://libraries.minecraft.net/")
-    maven("https://repo.spongepowered.org/maven/")
 }
 
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation("org.spongepowered:mixin:0.8.5-SNAPSHOT")
-    implementation("net.minecraft:launchwrapper:1.12")
-    api("net.fabricmc:access-widener:2.1.0")
+    implementation("com.google.code.gson:gson:2.9.0")
 
-    val asmVersion = "9.3"
-    compileOnly(api("org.ow2.asm:asm:$asmVersion")!!)
-    compileOnly(api("org.ow2.asm:asm-analysis:$asmVersion")!!)
-    compileOnly(api("org.ow2.asm:asm-commons:$asmVersion")!!)
-    compileOnly(api("org.ow2.asm:asm-tree:$asmVersion")!!)
-    compileOnly(api("org.ow2.asm:asm-util:$asmVersion")!!)
+    implementation("xyz.unifycraft:UniLaunchwrapper:1.0.1")
+
+    implementation("org.apache.logging.log4j:log4j-api:2.18.0")
+    implementation("org.apache.logging.log4j:log4j-core:2.18.0")
+    implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.18.0")
 }

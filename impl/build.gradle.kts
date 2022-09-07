@@ -1,9 +1,7 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     java
     kotlin("jvm")
-    // id("xyz.unifycraft.uniloom") version("1.0.0-beta.6")
+    id("xyz.unifycraft.uniloom") version("1.0.0-beta.17")
 }
 
 group = extra["project.group"]?.toString()
@@ -11,18 +9,18 @@ group = extra["project.group"]?.toString()
 version = extra["project.version"]?.toString()
     ?: throw groovy.lang.MissingPropertyException("Project version was not set!")
 
+val internal by configurations.creating {
+    configurations.implementation.get().extendsFrom(this)
+    configurations.modCompileClasspath.get().extendsFrom(this)
+}
+
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation(project(":api"))
-}
+    minecraft("com.mojang:minecraft:1.19.2")
+    mappings("net.fabricmc:yarn:1.19.2+build.8")
 
-tasks {
-    withType<KotlinCompile> {
-        kotlinOptions {
-            freeCompilerArgs += "-Xjvm-default=enable"
-        }
-    }
+    internal(project(":loader"))
 }

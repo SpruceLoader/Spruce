@@ -1,12 +1,16 @@
 package xyz.unifycraft.uniloader.loader.api
 
+import xyz.unifycraft.launchwrapper.api.ArgumentMap
+import xyz.unifycraft.uniloader.api.Entrypoint
 import xyz.unifycraft.uniloader.loader.impl.UniLoaderImpl
+import xyz.unifycraft.uniloader.loader.impl.metadata.ModMetadata
 import java.io.File
 
 interface UniLoader {
     companion object {
         private lateinit var instance: UniLoader
 
+        @JvmStatic
         fun getInstance(): UniLoader {
             if (!::instance.isInitialized) instance = UniLoaderImpl()
             return instance
@@ -26,9 +30,9 @@ interface UniLoader {
      */
     fun setEnvironment(environment: Environment)
     /**
-     * @return Whether we're currently in a development environment or not.
+     * @return The current Minecraft version which is being played on.
      */
-    fun isDev(): Boolean
+    fun getGameVersion(): String
 
     /**
      * @return The base directory that the game launches in.
@@ -54,8 +58,14 @@ interface UniLoader {
      */
     fun getModsDir(): File
 
-    // TODO - fun getMod(id: String): ModMetadata
-    // TODO - fun getAllMods(): List<ModMetadata>
-    // TODO - fun <T> getEntrypoints(namespace: String, type: Class<T>): List<T>
-    // TODO - fun isModLoaded(id: String): Boolean
+    /**
+     * Loads all mods in the classpath, mods directory and command-line
+     * into the game using our custom class loader.
+     */
+    fun load(argMap: ArgumentMap)
+
+    fun getMod(id: String): ModMetadata
+    fun getAllMods(): List<ModMetadata>
+    fun <T : Entrypoint> getEntrypoints(namespace: String, type: Class<T>): List<T>
+    fun isModLoaded(id: String): Boolean
 }

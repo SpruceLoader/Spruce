@@ -1,0 +1,41 @@
+{
+    "version": 1,
+    "libraries": {
+        "common": [
+            {
+                "artifact": "net.fabricmc:access-widener:2.1.0",
+                "url": "https://maven.fabricmc.net/"
+            },
+            {
+                "artifact": "org.spongepowered:mixin:0.8.5-SNAPSHOT",
+                "url": "https://repo.spongepowered.org/maven/"
+            },
+            {
+                "artifact": "org.ow2.asm:asm:9.3",
+                "url": "https://maven.fabricmc.net/"
+            },
+            {
+                "artifact": "org.ow2.asm:asm-analysis:9.3",
+                "url": "https://maven.fabricmc.net/"
+            },
+            {
+                "artifact": "org.ow2.asm:asm-commons:9.3",
+                "url": "https://maven.fabricmc.net/"
+            },
+            {
+                "artifact": "org.ow2.asm:asm-tree:9.3",
+                "url": "https://maven.fabricmc.net/"
+            },
+            {
+                "artifact": "org.ow2.asm:asm-util:9.3",
+                "url": "https://maven.fabricmc.net/"
+            }
+        ],
+        "client": [
+
+        ],
+        "server": [
+
+        ]
+    }
+}

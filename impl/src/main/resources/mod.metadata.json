@@ -1,15 +1,10 @@
 {
-    "metadata_version": 1,
+    "schema_version": 1,
 
     "name": "UniLoader",
     "version": "1.0.0",
     "id": "uniloader",
-    "type": "mod",
-
-    "license": {
-        "display_name": "LGPL-3.0 OR LATER",
-        "url": "https://www.gnu.org/licenses/lgpl-3.0.en.html"
-    },
+    "type": "mod_and_library",
 
     "contributors": [
         {
@@ -17,6 +12,16 @@
             "role": "Owner"
         }
     ],
+
+    "links": {
+        "home": "https://unifycraft.xyz",
+        "discord": "https://discord.unifycraft.xyz"
+    },
+
+    "license": {
+        "display_name": "LGPL-3.0 OR LATER",
+        "url": "https://www.gnu.org/licenses/lgpl-3.0.en.html"
+    },
 
     "loader": {
         "environment": "*"

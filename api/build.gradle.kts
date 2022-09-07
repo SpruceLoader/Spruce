@@ -17,7 +17,7 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation(project(":loader"))
+    //implementation(project(":loader"))
     implementation("xyz.unifycraft:UEventBus:1.0.0")
 }
 

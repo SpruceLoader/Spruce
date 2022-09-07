@@ -10,6 +10,6 @@ package xyz.unifycraft.uniloader.api
  * @see ClientModEntrypoint
  * @see ServerModEntrypoint
  */
-interface CommonModEntrypoint {
+interface CommonModEntrypoint : Entrypoint {
     fun initialize()
 }
