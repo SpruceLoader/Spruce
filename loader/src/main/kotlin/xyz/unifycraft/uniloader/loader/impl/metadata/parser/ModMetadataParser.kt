@@ -1,5 +1,6 @@
 package xyz.unifycraft.uniloader.loader.impl.metadata.parser
 
+import com.google.gson.JsonNull
 import com.google.gson.JsonObject
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
@@ -18,6 +19,8 @@ object ModMetadataParser {
         var version: String? = null
         var id: String? = null
         var type = ModType.MOD
+
+        var license = License("ARR", null)
 
         val contributors = mutableListOf<Contributor>()
         var links = ModLinks.empty()
@@ -68,7 +71,7 @@ object ModMetadataParser {
                         val value = reader.nextString()
                         type = ModType.values().first { it.name.equals(value, true) }
                     }
-                    // "license"
+                    "license" -> license = readLicense(reader, token)
                     "contributors" -> readContributors(contributors, reader, token)
                     "links" -> links = readLinks(reader, token)
                     "loader" -> loader = readLoader(reader, token)
@@ -85,9 +88,11 @@ object ModMetadataParser {
         println("Version: $version")
         println("ID: $id")
         println("Type: $type")
+        println("License: $license")
         println("Contributors: $contributors")
         println("Links: $links")
         println("Loader: $loader")
+        println("Additional: $additional")
 
         return ModMetadata(
             schemaVersion,
@@ -97,12 +102,53 @@ object ModMetadataParser {
             id ?: throw InvalidMetadataException("A mod ID is required!"),
             type,
 
+            license,
+
             contributors,
             links,
 
             loader,
             additional
         )
+    }
+
+    private fun readLicense(reader: JsonReader, token: JsonToken): License {
+        if (token != JsonToken.BEGIN_OBJECT)
+            throw InvalidMetadataException("license should be an object!")
+
+        var licenseName = ""
+        var licenseUrl: String? = null
+
+        reader.beginObject()
+
+        var currentName = ""
+        while (reader.hasNext()) {
+            val token = reader.peek()
+            if (token == JsonToken.NAME) {
+                currentName = reader.nextName()
+                continue
+            }
+
+            when (currentName) {
+                "name", "display_name" -> {
+                    if (token != JsonToken.STRING)
+                        throw InvalidMetadataException("license name/display name should be a string!")
+                    licenseName = reader.nextString()
+                }
+                "url", "link" -> {
+                    if (token != JsonToken.STRING)
+                        throw InvalidMetadataException("license url/link should be a string!")
+                    licenseUrl = reader.nextString()
+                }
+            }
+        }
+
+        reader.endObject()
+
+        if (licenseName.isBlank())
+            throw InvalidMetadataException("license name/display_name must be present!")
+
+        return License(licenseName, licenseUrl)
     }
 
     private fun readContributors(value: MutableList<Contributor>, reader: JsonReader, token: JsonToken) {
@@ -143,6 +189,11 @@ object ModMetadataParser {
             }
 
             reader.endObject()
+
+            if (contributorName.isBlank())
+                throw InvalidMetadataException("contributor name must be present!")
+            if (contributorRole.isBlank())
+                throw InvalidMetadataException("contributor role must be present!")
 
             value.add(Contributor(contributorName, contributorRole))
         }
@@ -269,11 +320,45 @@ object ModMetadataParser {
             }
         }
 
+        reader.endObject()
+
         return LoaderData(environment, accessWideners, mixins, mapOf())
     }
 
-    fun readAdditional(value: JsonObject, reader: JsonReader, token: JsonToken) {
+    private fun readAdditional(value: JsonObject, reader: JsonReader, token: JsonToken) {
+        println("Reading additional...")
+        if (token != JsonToken.BEGIN_OBJECT)
+            throw InvalidMetadataException("additional values should be a string!")
 
+        reader.beginObject()
+
+        var currentName = ""
+        while (reader.hasNext()) {
+            val token = reader.peek()
+            if (token == JsonToken.NAME) {
+                currentName = reader.nextName()
+                continue
+            }
+
+            when (token) {
+                JsonToken.STRING -> value.addProperty(currentName, reader.nextString())
+                JsonToken.BOOLEAN -> value.addProperty(currentName, reader.nextBoolean())
+                JsonToken.NULL -> value.add(currentName, JsonNull.INSTANCE)
+                JsonToken.NUMBER -> {
+                    val str = reader.nextString()
+                    if (str.contains(".")) {
+                        val double = str.toDoubleOrNull()
+                        if (double == null) {
+                            value.addProperty(currentName, str.toLong())
+                        } else value.addProperty(currentName, double)
+                    } else value.addProperty(currentName, str.toInt())
+                }
+
+                else -> reader.skipValue()
+            }
+        }
+
+        reader.endObject()
     }
 
 }

@@ -10,6 +10,9 @@ interface UniLoader {
     companion object {
         private lateinit var instance: UniLoader
 
+        const val NAME = "@NAME@"
+        const val VERSION = "@VERSION@"
+
         @JvmStatic
         fun getInstance(): UniLoader {
             if (!::instance.isInitialized) instance = UniLoaderImpl()

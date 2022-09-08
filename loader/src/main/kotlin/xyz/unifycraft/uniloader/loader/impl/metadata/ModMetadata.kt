@@ -10,7 +10,7 @@ data class ModMetadata(
     val id: String,
     val type: ModType,
 
-    // val license: License,
+    val license: License,
 
     val contributors: List<Contributor>,
     val links: ModLinks,

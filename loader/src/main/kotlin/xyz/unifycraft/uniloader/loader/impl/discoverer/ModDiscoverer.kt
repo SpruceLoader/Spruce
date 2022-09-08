@@ -32,6 +32,7 @@ class ModDiscoverer {
 
         metadata.forEach { println("meta: $it") }
 
+        this.mods.addAll(metadata)
         logger.info("Discovered ${mods.size} mods in ${System.currentTimeMillis() - startTime}ms.")
     }
 
@@ -47,6 +48,8 @@ class ModDiscoverer {
             version = UniLoader.getInstance().getGameVersion(),
             id = "minecraft",
             type = ModType.LIBRARY,
+
+            license = License("Unknown", null),
 
             contributors = listOf(Contributor("Mojang", "Author")),
             links = ModLinks(
@@ -74,6 +77,8 @@ class ModDiscoverer {
                 version = System.getProperty("java.specification.version").replaceFirst("^1\\.", ""),
                 id = "java",
                 type = ModType.LIBRARY,
+
+                license = License("Unknown", null),
 
                 contributors = emptyList(),
                 links = ModLinks(
