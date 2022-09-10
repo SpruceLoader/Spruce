@@ -21,12 +21,12 @@ object ModMetadataParser {
         var id: String? = null
         var type = mutableListOf(ModType.MOD)
 
-        var license = License("ARR", null)
+        var license: License? = null
 
         val contributors = mutableListOf<Contributor>()
-        var links = ModLinks.empty()
+        var links: ModLinks? = null
 
-        var loader = LoaderData.empty()
+        var loader: LoaderData? = null
 
         var additional = JsonObject()
 

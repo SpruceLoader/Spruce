@@ -10,12 +10,12 @@ data class ModMetadata(
     val id: String,
     val type: List<ModType>,
 
-    val license: License,
+    val license: License?,
 
     val contributors: List<Contributor>,
-    val links: ModLinks,
+    val links: ModLinks?,
 
-    val loader: LoaderData,
+    val loader: LoaderData?,
 
     val additional: JsonObject
 ) {

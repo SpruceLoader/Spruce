@@ -63,63 +63,35 @@ class ModDiscoverer {
     }
 
     private fun loadBuiltInMods() {
-        mods.add(ModMetadata(
-            schemaVersion = ModMetadata.CURRENT_SCHEMA_VERSION,
+        mods.add(builtinMod {
+            name = "Minecraft"
+            version = UniLoader.getInstance().getGameVersion()
+            id = "minecraft"
 
-            name = "Minecraft",
-            version = UniLoader.getInstance().getGameVersion(),
-            id = "minecraft",
-            type = listOf(ModType.LIBRARY),
+            license {
+                name = "Unknown"
+            }
 
-            license = License("Unknown", null),
+            contributor {
+                name = "Mojang Studios"
+                role = "Author"
+            }
 
-            contributors = listOf(Contributor("Mojang", "Author")),
-            links = ModLinks(
-                "https://minecraft.net",
-                null,
-                null,
-                "https://discord.gg/minecraft"
-            ),
+            links {
+                home = "https://minecraft.net"
+                discord = "https://discord.gg/minecract"
+            }
+        })
 
-            loader = LoaderData(
-                environment = Environment.BOTH,
-                accessWideners = emptyList(),
-                mixins = emptyList(),
-                entrypoints = emptyMap(),
-                dependencies = emptyList()
-            ),
+        mods.add(builtinMod {
+            name = System.getProperty("java.vm.name")
+            version = System.getProperty("java.specification.version").replaceFirst("^1\\.", "")
+            id = "java"
 
-            additional = JsonObject()
-        ))
-
-        mods.add(ModMetadata(
-            schemaVersion = ModMetadata.CURRENT_SCHEMA_VERSION,
-
-            name = System.getProperty("java.vm.name"),
-            version = System.getProperty("java.specification.version").replaceFirst("^1\\.", ""),
-            id = "java",
-            type = listOf(ModType.LIBRARY),
-
-            license = License("Unknown", null),
-
-            contributors = emptyList(),
-            links = ModLinks(
-                "https://java.com",
-                null,
-                null,
-                null
-            ),
-
-            loader = LoaderData(
-                environment = Environment.BOTH,
-                accessWideners = emptyList(),
-                mixins = emptyList(),
-                entrypoints = emptyMap(),
-                dependencies = emptyList()
-            ),
-
-            additional = JsonObject()
-        ))
+            links {
+                home = "https://java.com"
+            }
+        })
     }
 
     fun getMods() = mods.toList()

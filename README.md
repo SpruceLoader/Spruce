@@ -15,6 +15,12 @@ We take the best aspects of both Fabric and Forge and combine
 them into one beautifully executed mod loader which fits all
 your needs, whether you're a user or a developer.
 
+UniLoader also contains additional very useful features which
+other mod loader simply lack, such as optional built-in mods
+which make it easier to use the loader itself. These include
+things like a built-in mod browser (powered by [Modrinth][mr])
+and mod menu.
+
 You'll see more info here as we progress with the project's
 lifecycle. Join [our Discord server][discord] to keep up with
 any updates!
@@ -34,3 +40,4 @@ this file as soon as it's possible to test things out.
 
 [lgpl3]: https://www.gnu.org/licenses/lgpl-3.0.en.html
 [discord]: https://discord.unifycraft.xyz
+[mr]: https://modrinth.com
