@@ -85,40 +85,41 @@ class ModDiscoverer {
                 environment = Environment.BOTH,
                 accessWideners = emptyList(),
                 mixins = emptyList(),
-                entrypoints = emptyMap()
+                entrypoints = emptyMap(),
+                dependencies = emptyList()
             ),
 
             additional = JsonObject()
         ))
 
-        mods.add(
-            ModMetadata(
+        mods.add(ModMetadata(
             schemaVersion = ModMetadata.CURRENT_SCHEMA_VERSION,
 
-                name = System.getProperty("java.vm.name"),
-                version = System.getProperty("java.specification.version").replaceFirst("^1\\.", ""),
-                id = "java",
-                type = listOf(ModType.LIBRARY),
+            name = System.getProperty("java.vm.name"),
+            version = System.getProperty("java.specification.version").replaceFirst("^1\\.", ""),
+            id = "java",
+            type = listOf(ModType.LIBRARY),
 
-                license = License("Unknown", null),
+            license = License("Unknown", null),
 
-                contributors = emptyList(),
-                links = ModLinks(
-                    "https://java.com",
-                    null,
-                    null,
-                    null
-                ),
+            contributors = emptyList(),
+            links = ModLinks(
+                "https://java.com",
+                null,
+                null,
+                null
+            ),
 
-                loader = LoaderData(
-                    environment = Environment.BOTH,
-                    accessWideners = emptyList(),
-                    mixins = emptyList(),
-                    entrypoints = emptyMap()
-                ),
+            loader = LoaderData(
+                environment = Environment.BOTH,
+                accessWideners = emptyList(),
+                mixins = emptyList(),
+                entrypoints = emptyMap(),
+                dependencies = emptyList()
+            ),
 
-                additional = JsonObject()
-            ))
+            additional = JsonObject()
+        ))
     }
 
     fun getMods() = mods.toList()
