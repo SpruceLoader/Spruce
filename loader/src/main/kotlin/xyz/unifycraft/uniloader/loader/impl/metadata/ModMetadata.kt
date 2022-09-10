@@ -8,7 +8,7 @@ data class ModMetadata(
     val name: String?,
     val version: String,
     val id: String,
-    val type: ModType,
+    val type: List<ModType>,
 
     val license: License,
 

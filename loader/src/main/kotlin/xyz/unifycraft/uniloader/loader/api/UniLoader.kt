@@ -62,6 +62,11 @@ interface UniLoader {
     fun getModsDir(): File
 
     /**
+     * @return Whether the mod loading process is finished or not, mostly
+     * used in internals.
+     */
+    fun isLoadingComplete(): Boolean
+    /**
      * Loads all mods in the classpath, mods directory and command-line
      * into the game using our custom class loader.
      */

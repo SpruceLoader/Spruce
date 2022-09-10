@@ -36,7 +36,7 @@
         "entrypoints": [
             {
                 "type": "common",
-                "value": "com.example.ExampleMod::initialize"
+                "value": "com.example.ExampleMod"
             },
             {
                 "type": "client",

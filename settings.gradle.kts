@@ -37,3 +37,5 @@ include(":loader")
 include(":api")
 // Here we implement the classes in our API
 include(":impl")
+// Simply for testing the loader internally
+include(":test-mod")

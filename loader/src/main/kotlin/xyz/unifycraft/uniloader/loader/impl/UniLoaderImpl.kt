@@ -10,11 +10,13 @@ import xyz.unifycraft.uniloader.loader.impl.discoverer.finders.ClasspathModFinde
 import xyz.unifycraft.uniloader.loader.impl.discoverer.finders.DirectoryModFinder
 import xyz.unifycraft.uniloader.loader.impl.metadata.ModMetadata
 import java.io.File
+import java.lang.IllegalArgumentException
 
 class UniLoaderImpl : UniLoader {
     private lateinit var currentEnvironment: Environment
     private lateinit var gameVersion: String
     private val discoverer = ModDiscoverer()
+    private var loadingComplete = false
 
     override fun getEnvironment() = currentEnvironment
     override fun setEnvironment(environment: Environment) {
@@ -26,8 +28,9 @@ class UniLoaderImpl : UniLoader {
     override fun getLoaderDir() = File(getGameDir(), "UniLoader")
     override fun getConfigDir() = File(getLoaderDir(), "config")
     override fun getDataDir() = File(getLoaderDir(), "data")
-    override fun getModsDir() = File("mods")
+    override fun getModsDir() = File(getLoaderDir(), "mods")
 
+    override fun isLoadingComplete() = loadingComplete
     override fun load(argMap: ArgumentMap) {
         gameVersion = argMap.getSingular("version")
 
@@ -42,22 +45,21 @@ class UniLoaderImpl : UniLoader {
         for (mod in discoverer.getMods()) {
             println("Mod ${mod.name} with ID ${mod.id} and version ${mod.version} was loaded successfully!")
         }
+
+        loadingComplete = true
     }
 
-    override fun getMod(id: String): ModMetadata {
-        TODO("Not yet implemented")
-    }
+    override fun getMod(id: String) = discoverer.getMods().firstOrNull {
+        it.id.equals(id, true)
+    } ?: throw IllegalArgumentException("Mod with ID \"$id\" is not present!")
 
-    override fun getAllMods(): List<ModMetadata> {
-        TODO("Not yet implemented")
-    }
+    override fun getAllMods() = discoverer.getMods()
 
     override fun <T : Entrypoint> getEntrypoints(namespace: String, type: Class<T>): List<T> {
-        //TODO("Not yet implemented")
         return listOf()
     }
 
-    override fun isModLoaded(id: String): Boolean {
-        TODO("Not yet implemented")
+    override fun isModLoaded(id: String) = discoverer.getMods().any {
+        it.id.equals(id, true)
     }
 }

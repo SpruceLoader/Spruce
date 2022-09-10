@@ -8,14 +8,14 @@ import java.util.EnumSet
 class DirectoryModFinder(
     val directory: File
 ) : ModFinder {
-    override fun find(): List<String> {
+    override fun find(): List<File> {
         if (!directory.exists() && !directory.mkdirs())
             throw IllegalStateException("Failed to create directory. (${directory.absolutePath})")
         if (!directory.isDirectory)
             throw IllegalArgumentException("${directory.absolutePath} is NOT a directory!")
 
         val path = directory.toPath()
-        val returnValue = mutableListOf<String>()
+        val returnValue = mutableListOf<File>()
         Files.walkFileTree(path, EnumSet.of(FileVisitOption.FOLLOW_LINKS), 1, FileVisitor(returnValue))
 
         return returnValue
@@ -23,11 +23,11 @@ class DirectoryModFinder(
 }
 
 private class FileVisitor(
-    val value: MutableList<String>
+    val value: MutableList<File>
 ) : SimpleFileVisitor<Path>() {
     override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
         if (file.isModFile())
-            value.add(file.toFile().readText())
+            value.add(file.toFile())
 
         return FileVisitResult.CONTINUE
     }

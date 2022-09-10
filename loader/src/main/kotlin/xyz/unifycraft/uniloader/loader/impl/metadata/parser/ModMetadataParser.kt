@@ -13,12 +13,13 @@ object ModMetadataParser {
 
     @JvmStatic
     fun read(jsonInput: String): ModMetadata {
+        println("JSON input: $jsonInput")
         var schemaVersion = ModMetadata.CURRENT_SCHEMA_VERSION
 
         var name: String? = null
         var version: String? = null
         var id: String? = null
-        var type = ModType.MOD
+        var type = mutableListOf(ModType.MOD)
 
         var license = License("ARR", null)
 
@@ -65,12 +66,7 @@ object ModMetadataParser {
                             throw InvalidMetadataException("id should be a string!")
                         id = reader.nextString()
                     }
-                    "type" -> {
-                        if (token != JsonToken.STRING)
-                            throw InvalidMetadataException("type should be a string!")
-                        val value = reader.nextString()
-                        type = ModType.values().first { it.name.equals(value, true) }
-                    }
+                    "type" -> readTypes(type, reader, token)
                     "license" -> license = readLicense(reader, token)
                     "contributors" -> readContributors(contributors, reader, token)
                     "links" -> links = readLinks(reader, token)
@@ -110,6 +106,32 @@ object ModMetadataParser {
             loader,
             additional
         )
+    }
+
+    private fun readTypes(value: MutableList<ModType>, reader: JsonReader, token: JsonToken) {
+        fun determineTypeFrom(input: String) = ModType.values().firstOrNull {
+            it.name.equals(input, true)
+        } ?: throw InvalidMetadataException("Invalid mod type entered!")
+
+        value.clear()
+
+        when (token) {
+            JsonToken.STRING -> value.add(determineTypeFrom(reader.nextString()))
+            JsonToken.BEGIN_ARRAY -> {
+                reader.beginArray()
+
+                while (reader.hasNext()) {
+                    val token = reader.peek()
+                    if (token != JsonToken.STRING)
+                        throw InvalidMetadataException("type should be a string!")
+
+                    value.add(determineTypeFrom(reader.nextString()))
+                }
+
+                reader.endArray()
+            }
+            else -> throw InvalidMetadataException("type should be a string or an array!")
+        }
     }
 
     private fun readLicense(reader: JsonReader, token: JsonToken): License {
@@ -317,16 +339,16 @@ object ModMetadataParser {
                         else -> throw InvalidMetadataException("loader mixins should either be a string or an array!")
                     }
                 }
+                else -> reader.skipValue()
             }
         }
 
         reader.endObject()
 
-        return LoaderData(environment, accessWideners, mixins, mapOf())
+        return LoaderData(environment, accessWideners, mixins, mapOf(), emptyList())
     }
 
     private fun readAdditional(value: JsonObject, reader: JsonReader, token: JsonToken) {
-        println("Reading additional...")
         if (token != JsonToken.BEGIN_OBJECT)
             throw InvalidMetadataException("additional values should be a string!")
 

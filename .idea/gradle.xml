@@ -15,6 +15,7 @@
             <option value="$PROJECT_DIR$/api" />
             <option value="$PROJECT_DIR$/impl" />
             <option value="$PROJECT_DIR$/loader" />
+            <option value="$PROJECT_DIR$/test-mod" />
           </set>
         </option>
       </GradleProjectSettings>
