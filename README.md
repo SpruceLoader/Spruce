@@ -1,7 +1,9 @@
 <div align="center">
 
 # [`UniLoader`]
-The Minecraft mod loader that makes a difference.
+**The Minecraft mod loader that makes a difference.**
+
+### **THIS PROJECT IS STILL EXPERIMENTAL!**
 
 </div>
 
@@ -9,11 +11,15 @@ The Minecraft mod loader that makes a difference.
 
 UniLoader is a Minecraft mod loader which fixes issues that
 other mod loaders have overlooked in the past, and pretty much
-reinvents the wheel to do so.
+reinvents the wheel to do so. The entire project is written from
+scratch, aside from borrowing a few small components from existant
+loaders. 
 
 We take the best aspects of both Fabric and Forge and combine
 them into one beautifully executed mod loader which fits all
-your needs, whether you're a user or a developer.
+your needs, whether you're a user or a developer. This means we
+also include a massive built-in API (no additional mods for this!)
+to make mods not just more stable, but significantly easier to make.
 
 UniLoader also contains additional very useful features which
 other mod loader simply lack, such as optional built-in mods
@@ -25,11 +31,11 @@ You'll see more info here as we progress with the project's
 lifecycle. Join [our Discord server][discord] to keep up with
 any updates!
 
-**THIS PROJECT IS STILL EXPERIMENTAL!**
-
 ## How do I run it?
-Currently, UniLoader is very WIP and cannot be used. We'll update
-this file as soon as it's possible to test things out.
+As of right now, UniLoader is not available for use as a
+user. If you're a developer, it is possible to run the loader
+from within the project itself using the automatically generated
+IntelliJ IDEA run configurations.
 
 <div align="center">
 
