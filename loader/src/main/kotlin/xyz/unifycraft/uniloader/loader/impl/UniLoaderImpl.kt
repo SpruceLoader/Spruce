@@ -8,6 +8,7 @@ import xyz.unifycraft.uniloader.loader.api.UniLoader
 import xyz.unifycraft.uniloader.loader.impl.discoverer.ModDiscoverer
 import xyz.unifycraft.uniloader.loader.impl.discoverer.finders.ClasspathModFinder
 import xyz.unifycraft.uniloader.loader.impl.discoverer.finders.DirectoryModFinder
+import xyz.unifycraft.uniloader.loader.impl.entrypoints.EntrypointHandler
 import xyz.unifycraft.uniloader.loader.impl.metadata.ModMetadata
 import java.io.File
 import java.lang.IllegalArgumentException
@@ -38,7 +39,7 @@ class UniLoaderImpl : UniLoader {
         discoverer.addFinder(DirectoryModFinder(getModsDir()))
         discoverer.discover()
 
-        for (entrypoint in getEntrypoints("preLaunch", PreLaunchEntrypoint::class.java)) {
+        for (entrypoint in getEntrypoints<PreLaunchEntrypoint>("preLaunch")) {
             entrypoint.initialize(argMap)
         }
 
@@ -55,9 +56,8 @@ class UniLoaderImpl : UniLoader {
 
     override fun getAllMods() = discoverer.getMods()
 
-    override fun <T : Entrypoint> getEntrypoints(namespace: String, type: Class<T>): List<T> {
-        return listOf()
-    }
+    override fun <T : Entrypoint> getEntrypoints(namespace: String): List<T> =
+        EntrypointHandler.getEntrypoints(namespace)?.map { it as T } ?: emptyList()
 
     override fun isModLoaded(id: String) = discoverer.getMods().any {
         it.id.equals(id, true)

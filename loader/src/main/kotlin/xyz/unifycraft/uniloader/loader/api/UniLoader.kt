@@ -74,6 +74,6 @@ interface UniLoader {
 
     fun getMod(id: String): ModMetadata
     fun getAllMods(): List<ModMetadata>
-    fun <T : Entrypoint> getEntrypoints(namespace: String, type: Class<T>): List<T>
+    fun <T : Entrypoint> getEntrypoints(namespace: String): List<T>
     fun isModLoaded(id: String): Boolean
 }

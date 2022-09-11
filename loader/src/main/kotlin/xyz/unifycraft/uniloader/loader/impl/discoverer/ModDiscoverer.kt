@@ -1,18 +1,15 @@
 package xyz.unifycraft.uniloader.loader.impl.discoverer
 
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonObject
 import org.apache.logging.log4j.LogManager
 import xyz.unifycraft.launchwrapper.Launch
-import xyz.unifycraft.uniloader.loader.api.Environment
 import xyz.unifycraft.uniloader.loader.api.UniLoader
 import xyz.unifycraft.uniloader.loader.exceptions.ModDiscoveryException
+import xyz.unifycraft.uniloader.loader.impl.entrypoints.EntrypointHandler
 import xyz.unifycraft.uniloader.loader.impl.discoverer.finders.ModFinder
 import xyz.unifycraft.uniloader.loader.impl.metadata.*
 import xyz.unifycraft.uniloader.loader.impl.metadata.parser.ModMetadataParser
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.net.JarURLConnection
 import java.nio.charset.StandardCharsets
 import java.util.jar.JarFile
 
@@ -52,9 +49,9 @@ class ModDiscoverer {
             } else continue
         }
 
-        val metadata = rawMetadata.map(ModMetadataParser::read)
+        this.mods.addAll(rawMetadata.map(ModMetadataParser::read))
+        EntrypointHandler.initialize(this)
 
-        this.mods.addAll(metadata)
         logger.info("Discovered ${mods.size} mods in ${System.currentTimeMillis() - startTime}ms.")
     }
 

@@ -12,6 +12,8 @@ import xyz.unifycraft.uniloader.api.TransformerEntrypoint
 import xyz.unifycraft.uniloader.loader.api.Properties
 import xyz.unifycraft.uniloader.loader.api.UniLoader
 import xyz.unifycraft.uniloader.loader.impl.transform.BrandingTransformer
+import xyz.unifycraft.uniloader.loader.impl.transform.ClientEntrypointTransformer
+import xyz.unifycraft.uniloader.loader.impl.transform.ServerEntrypointTransformer
 import java.io.File
 import java.io.FileOutputStream
 
@@ -30,7 +32,7 @@ class LoaderLaunchTransformer : LaunchTransformer {
     override fun transform(className: String, rawClass: ByteArray): ByteArray {
         var modified = false
 
-       val classReader = ClassReader(rawClass)
+        val classReader = ClassReader(rawClass)
         val classWriter = ClassWriter(ClassWriter.COMPUTE_FRAMES or ClassWriter.COMPUTE_MAXS)
         val classNode = ClassNode()
         classReader.accept(classNode, ClassReader.EXPAND_FRAMES)
@@ -41,10 +43,20 @@ class LoaderLaunchTransformer : LaunchTransformer {
                 modified = true
                 BrandingTransformer.transform(classNode)
             }
+
+            "net.minecraft.client.MinecraftClient" -> {
+                modified = true
+                ClientEntrypointTransformer.transform(classNode)
+            }
+
+            "net.minecraft.server.Main" -> {
+                modified = true
+                ServerEntrypointTransformer.transform(classNode)
+            }
         }
 
         if (UniLoader.getInstance().isLoadingComplete()) {
-            for (entrypoint in UniLoader.getInstance().getEntrypoints("transformer", TransformerEntrypoint::class.java)) {
+            for (entrypoint in UniLoader.getInstance().getEntrypoints<TransformerEntrypoint>("transformer")) {
                 val madeModification = entrypoint.performTransform(className, classNode)
                 if (!modified) modified = madeModification
             }
@@ -52,7 +64,9 @@ class LoaderLaunchTransformer : LaunchTransformer {
 
         classNode.accept(classWriter)
 
-        if (modified && (System.getProperty(Properties.Debug.TRANSFORM_DEBUG, "false").toBooleanStrictOrNull() == true)) {
+        if (modified && (System.getProperty(Properties.Debug.TRANSFORM_DEBUG, "false")
+                .toBooleanStrictOrNull() == true)
+        ) {
             val dir = File(UniLoader.getInstance().getLoaderDir(), "bytecode")
             dir.mkdirs()
             val fixedClassName =

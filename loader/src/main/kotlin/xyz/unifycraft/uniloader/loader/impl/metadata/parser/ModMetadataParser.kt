@@ -277,7 +277,7 @@ object ModMetadataParser {
         var environment = Environment.BOTH
         val accessWideners = mutableListOf<String>()
         val mixins = mutableListOf<String>()
-        // val entrypoints =
+        val entrypoints = mutableMapOf<String, EntrypointMetadata>()
         // val dependencies =
 
         reader.beginObject()
@@ -331,6 +331,7 @@ object ModMetadataParser {
                                 val token = reader.peek()
                                 if (token != JsonToken.STRING)
                                     throw InvalidMetadataException("loader mixins only accepts strings!")
+
                                 mixins.add(reader.nextString())
                             }
 
@@ -339,13 +340,64 @@ object ModMetadataParser {
                         else -> throw InvalidMetadataException("loader mixins should either be a string or an array!")
                     }
                 }
+                "entrypoints" -> {
+                    if (token != JsonToken.BEGIN_ARRAY)
+                        throw InvalidMetadataException("loader entrypoints should be an array!")
+
+                    reader.beginArray()
+
+                    while (reader.hasNext()) {
+                        val token = reader.peek()
+                        if (token != JsonToken.BEGIN_OBJECT)
+                            throw InvalidMetadataException("loader entrypoint should be an object!")
+
+                        var entrypointType = ""
+                        var entrypointValue = ""
+                        var entrypointAdapter: String? = null
+
+                        reader.beginObject()
+
+                        var currentName = ""
+                        while (reader.hasNext()) {
+                            val token = reader.peek()
+                            if (token == JsonToken.NAME) {
+                                currentName = reader.nextName()
+                                continue
+                            }
+
+                            when (currentName) {
+                                "type" -> {
+                                    if (token != JsonToken.STRING)
+                                        throw InvalidMetadataException("entrypoint type should be a string!")
+                                    entrypointType = reader.nextString()
+                                }
+                                "value" -> {
+                                    if (token != JsonToken.STRING)
+                                        throw InvalidMetadataException("entrypoint value should be a string!")
+                                    entrypointValue = reader.nextString()
+                                }
+                                "adapter" -> {
+                                    if (token != JsonToken.STRING)
+                                        throw InvalidMetadataException("entrypoint adapter should be a string!")
+                                    entrypointAdapter = reader.nextString()
+                                }
+                            }
+                        }
+
+                        reader.endObject()
+
+                        entrypoints[entrypointType] = EntrypointMetadata(entrypointAdapter, entrypointValue)
+                    }
+
+                    reader.endArray()
+                }
                 else -> reader.skipValue()
             }
         }
 
         reader.endObject()
 
-        return LoaderData(environment, accessWideners, mixins, mapOf(), emptyList())
+        return LoaderData(environment, accessWideners, mixins, entrypoints, emptyList())
     }
 
     private fun readAdditional(value: JsonObject, reader: JsonReader, token: JsonToken) {

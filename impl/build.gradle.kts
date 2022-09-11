@@ -22,5 +22,6 @@ dependencies {
     minecraft("com.mojang:minecraft:1.19.2")
     mappings("net.fabricmc:yarn:1.19.2+build.8")
 
+    implementation("xyz.unifycraft:UniLaunchwrapper:1.0.1")
     internal(project(":loader"))
 }

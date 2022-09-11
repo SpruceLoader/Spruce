@@ -22,13 +22,7 @@
     },
 
     "loader": {
-        "environment": "*",
-        "entrypoints": [
-            {
-                "type": "client",
-                "value": "xyz.deftu.TestModClient"
-            }
-        ]
+        "environment": "*"
     },
 
     "license": {
