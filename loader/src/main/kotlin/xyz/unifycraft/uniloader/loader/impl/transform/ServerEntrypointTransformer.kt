@@ -1,13 +1,14 @@
 package xyz.unifycraft.uniloader.loader.impl.transform
 
-import org.apache.logging.log4j.LogManager
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.ClassNode
+import xyz.unifycraft.uniloader.ulasm.transformers.BaseTransformer
 
-object ServerEntrypointTransformer {
-    private val logger = LogManager.getLogger()
+object ServerEntrypointTransformer : BaseTransformer {
+    override fun getTargets() = listOf("net.minecraft.server.Main")
+    override fun transform(node: ClassNode): Boolean {
+        var modified = false
 
-    fun transform(node: ClassNode) {
         for (method in node.methods) {
             if (method.name != "main") continue
 
@@ -17,7 +18,10 @@ object ServerEntrypointTransformer {
                 if (insn.opcode != Opcodes.NEW) continue
 
                 // TODO
+                modified = true
             }
         }
+
+        return modified
     }
 }

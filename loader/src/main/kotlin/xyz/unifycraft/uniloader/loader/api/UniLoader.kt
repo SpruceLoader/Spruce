@@ -22,50 +22,43 @@ interface UniLoader {
 
     /**
      * @return The current game environment we're in.
+     * @param <set-?> The current environment state.
      */
-    fun getEnvironment(): Environment
-    /**
-     * This method is for **INTERNAL USE ONLY**. If it's called
-     * after the initial environment has been set, it will throw
-     * an exception.
-     *
-     * @param environment The current environment state.
-     */
-    fun setEnvironment(environment: Environment)
+    var environment: Environment
     /**
      * @return The current Minecraft version which is being played on.
      */
-    fun getGameVersion(): String
+    val gameVersion: String
 
     /**
      * @return The base directory that the game launches in.
      */
-    fun getGameDir(): File
+    val gameDir: File
     /**
      * @return The directory used for UniLoader specifically.
      * This is NOT the base game directory, but instead a "UniLoader" subdirectory.
      */
-    fun getLoaderDir(): File
+    val loaderDir: File
     /**
      * @return The directory specifically made for the purpose of storing
      * mod configuration files.
      */
-    fun getConfigDir(): File
+    val configDir: File
     /**
      * @return The directory made for storing mod's data, whether it be temporary
      * or not.
      */
-    fun getDataDir(): File
+    val dataDir: File
     /**
      * @return The directory which stores all the individual mod files.
      */
-    fun getModsDir(): File
+    val modsDir: File
 
     /**
      * @return Whether the mod loading process is finished or not, mostly
      * used in internals.
      */
-    fun isLoadingComplete(): Boolean
+    val isLoadingComplete: Boolean
     /**
      * Loads all mods in the classpath, mods directory and command-line
      * into the game using our custom class loader.
@@ -73,7 +66,7 @@ interface UniLoader {
     fun load(argMap: ArgumentMap)
 
     fun getMod(id: String): ModMetadata
-    fun getAllMods(): List<ModMetadata>
+    val allMods: List<ModMetadata>
     fun <T : Entrypoint> getEntrypoints(namespace: String): List<T>
     fun isModLoaded(id: String): Boolean
 }

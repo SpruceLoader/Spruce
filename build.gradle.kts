@@ -1,4 +1,9 @@
 allprojects {
+    group = extra["project.group"]?.toString()
+        ?: throw groovy.lang.MissingPropertyException("Project group was not set!")
+    version = extra["project.version"]?.toString()
+        ?: throw groovy.lang.MissingPropertyException("Project version was not set!")
+
     repositories {
         // Default repositories
         mavenCentral()

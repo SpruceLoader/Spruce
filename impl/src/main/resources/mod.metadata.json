@@ -22,7 +22,13 @@
     },
 
     "loader": {
-        "environment": "*"
+        "environment": "*",
+        "dependencies": [
+            {
+                "id": "minecraft",
+                "version": "Unknown"
+            }
+        ]
     },
 
     "license": {

@@ -5,6 +5,7 @@ import xyz.unifycraft.uniloader.api.Entrypoint
 import xyz.unifycraft.uniloader.loader.impl.discoverer.ModDiscoverer
 import xyz.unifycraft.uniloader.loader.impl.metadata.EntrypointMetadata
 
+// TODO - Improve... This is pretty bad
 object EntrypointHandler {
     private val metadata = mutableMapOf<String, EntrypointMetadata>()
     private val adapterCache = mutableMapOf<String, EntrypointAdapter>()

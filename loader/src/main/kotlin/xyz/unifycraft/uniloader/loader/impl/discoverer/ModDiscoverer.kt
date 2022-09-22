@@ -38,9 +38,15 @@ class ModDiscoverer {
                 if (!file.extension.endsWith("jar")) throw ModDiscoveryException("Invalid mod file found!")
 
                 val jar = JarFile(file)
-                val entry = jar.getInputStream(jar.getEntry(ModMetadata.FILE_NAME))
+                val entry = jar.getEntry(ModMetadata.FILE_NAME)
+                if (entry == null) {
+                    logger.warn("Invalid JAR file found in mods folder! (this shouldn't happen...)")
+                    continue
+                }
+
+                val metadata = jar.getInputStream(entry)
                 val outputStream = ByteArrayOutputStream()
-                entry.copyTo(outputStream)
+                metadata.copyTo(outputStream)
                 rawMetadata.add(String(outputStream.toByteArray(), StandardCharsets.UTF_8))
 
                 Launch.getInstance().addToClassPath(file.toPath())
@@ -62,7 +68,7 @@ class ModDiscoverer {
     private fun loadBuiltInMods() {
         mods.add(builtinMod {
             name = "Minecraft"
-            version = UniLoader.getInstance().getGameVersion()
+            version = UniLoader.getInstance().gameVersion
             id = "minecraft"
 
             license {

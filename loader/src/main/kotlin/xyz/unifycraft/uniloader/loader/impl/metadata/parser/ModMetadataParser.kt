@@ -5,6 +5,7 @@ import com.google.gson.JsonObject
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import xyz.unifycraft.uniloader.loader.api.Environment
+import xyz.unifycraft.uniloader.loader.api.metadata.Version
 import xyz.unifycraft.uniloader.loader.exceptions.InvalidMetadataException
 import xyz.unifycraft.uniloader.loader.impl.metadata.*
 import java.io.StringReader
@@ -13,11 +14,10 @@ object ModMetadataParser {
 
     @JvmStatic
     fun read(jsonInput: String): ModMetadata {
-        println("JSON input: $jsonInput")
         var schemaVersion = ModMetadata.CURRENT_SCHEMA_VERSION
 
         var name: String? = null
-        var version: String? = null
+        var version: Version? = null
         var id: String? = null
         var type = mutableListOf(ModType.MOD)
 
@@ -59,7 +59,7 @@ object ModMetadataParser {
                     "version" -> {
                         if (token != JsonToken.STRING)
                             throw InvalidMetadataException("version should be a string!")
-                        version = reader.nextString()
+                        version = VersionParser.parse(reader.nextString())
                     }
                     "id" -> {
                         if (token != JsonToken.STRING)
@@ -79,16 +79,7 @@ object ModMetadataParser {
             reader.endObject()
         }
 
-        println("Schema version: $schemaVersion")
-        println("Name: $name")
-        println("Version: $version")
-        println("ID: $id")
-        println("Type: $type")
-        println("License: $license")
-        println("Contributors: $contributors")
-        println("Links: $links")
         println("Loader: $loader")
-        println("Additional: $additional")
 
         return ModMetadata(
             schemaVersion,
@@ -276,9 +267,8 @@ object ModMetadataParser {
 
         var environment = Environment.BOTH
         val accessWideners = mutableListOf<String>()
-        val mixins = mutableListOf<String>()
         val entrypoints = mutableMapOf<String, EntrypointMetadata>()
-        // val dependencies =
+        val dependencies = mutableListOf<Dependency>()
 
         reader.beginObject()
 
@@ -301,9 +291,7 @@ object ModMetadataParser {
                 }
                 "access_wideners" -> {
                     when (token) {
-                        JsonToken.STRING -> {
-                            accessWideners.add(reader.nextString())
-                        }
+                        JsonToken.STRING -> accessWideners.add(reader.nextString())
                         JsonToken.BEGIN_ARRAY -> {
                             reader.beginArray()
 
@@ -317,27 +305,6 @@ object ModMetadataParser {
                             reader.endArray()
                         }
                         else -> throw InvalidMetadataException("loader access wideners should either be a string or an array!")
-                    }
-                }
-                "mixins" -> {
-                    when (token) {
-                        JsonToken.STRING -> {
-                            mixins.add(reader.nextString())
-                        }
-                        JsonToken.BEGIN_ARRAY -> {
-                            reader.beginArray()
-
-                            while (reader.hasNext()) {
-                                val token = reader.peek()
-                                if (token != JsonToken.STRING)
-                                    throw InvalidMetadataException("loader mixins only accepts strings!")
-
-                                mixins.add(reader.nextString())
-                            }
-
-                            reader.endArray()
-                        }
-                        else -> throw InvalidMetadataException("loader mixins should either be a string or an array!")
                     }
                 }
                 "entrypoints" -> {
@@ -391,13 +358,100 @@ object ModMetadataParser {
 
                     reader.endArray()
                 }
+                "dependencies" -> {
+                    println("parsing dependencies")
+                    if (token != JsonToken.BEGIN_ARRAY)
+                        throw InvalidMetadataException("loader dependencies should be an array!")
+
+                    reader.beginArray()
+
+                    while (reader.hasNext()) {
+                        val token = reader.peek()
+                        if (token != JsonToken.BEGIN_OBJECT)
+                            throw InvalidMetadataException("loader entrypoint should be an object!")
+
+                        var dependencyId = ""
+                        var dependencyVersion: Version? = null
+                        val dependencyUnless = mutableListOf<String>()
+                        val dependencyOnly = mutableListOf<String>()
+
+                        reader.beginObject()
+
+                        var currentName = ""
+                        while (reader.hasNext()) {
+                            val token = reader.peek()
+                            if (token == JsonToken.NAME) {
+                                currentName = reader.nextName()
+                                continue
+                            }
+
+                            when (currentName) {
+                                "id" -> {
+                                    if (token != JsonToken.STRING)
+                                        throw InvalidMetadataException("dependency id should be a string!")
+                                    dependencyId = reader.nextString()
+                                }
+                                "version" -> {
+                                    if (token != JsonToken.STRING)
+                                        throw InvalidMetadataException("dependency version should be a string!")
+                                    dependencyVersion = VersionParser.parse(reader.nextString())
+                                }
+                                "unless" -> {
+                                    when (token) {
+                                        JsonToken.STRING -> dependencyUnless.add(reader.nextString())
+                                        JsonToken.BEGIN_ARRAY -> {
+                                            reader.beginArray()
+
+                                            while (reader.hasNext()) {
+                                                val token = reader.peek()
+                                                if (token != JsonToken.STRING)
+                                                    throw InvalidMetadataException("loader access wideners only accepts strings!")
+                                                dependencyUnless.add(reader.nextString())
+                                            }
+
+                                            reader.endArray()
+                                        }
+                                        else -> throw InvalidMetadataException("loader dependency (ID: $dependencyId) unless should either be a string or an array!")
+                                    }
+                                }
+                                "only" -> {
+                                    when (token) {
+                                        JsonToken.STRING -> dependencyOnly.add(reader.nextString())
+                                        JsonToken.BEGIN_ARRAY -> {
+                                            reader.beginArray()
+
+                                            while (reader.hasNext()) {
+                                                val token = reader.peek()
+                                                if (token != JsonToken.STRING)
+                                                    throw InvalidMetadataException("loader access wideners only accepts strings!")
+                                                dependencyOnly.add(reader.nextString())
+                                            }
+
+                                            reader.endArray()
+                                        }
+                                        else -> throw InvalidMetadataException("loader dependency (ID: $dependencyId) only should either be a string or an array!")
+                                    }
+                                }
+                            }
+                        }
+
+                        reader.endObject()
+
+                        if (dependencyVersion == null)
+                            throw InvalidMetadataException("dependency version appears to be invalid! ($dependencyId)")
+
+                        dependencies.add(Dependency(dependencyId, dependencyVersion, dependencyUnless, dependencyOnly))
+                    }
+
+                    reader.endArray()
+                }
                 else -> reader.skipValue()
             }
         }
 
         reader.endObject()
 
-        return LoaderData(environment, accessWideners, mixins, entrypoints, emptyList())
+        return LoaderData(environment, accessWideners, entrypoints, dependencies)
     }
 
     private fun readAdditional(value: JsonObject, reader: JsonReader, token: JsonToken) {

@@ -1,10 +1,12 @@
 package xyz.unifycraft.uniloader.loader.impl
 
+import org.apache.logging.log4j.LogManager
 import xyz.unifycraft.launchwrapper.api.ArgumentMap
 import xyz.unifycraft.uniloader.api.Entrypoint
 import xyz.unifycraft.uniloader.api.PreLaunchEntrypoint
 import xyz.unifycraft.uniloader.loader.api.Environment
 import xyz.unifycraft.uniloader.loader.api.UniLoader
+import xyz.unifycraft.uniloader.loader.exceptions.MissingDependencyException
 import xyz.unifycraft.uniloader.loader.impl.discoverer.ModDiscoverer
 import xyz.unifycraft.uniloader.loader.impl.discoverer.finders.ClasspathModFinder
 import xyz.unifycraft.uniloader.loader.impl.discoverer.finders.DirectoryModFinder
@@ -14,47 +16,74 @@ import java.io.File
 import java.lang.IllegalArgumentException
 
 class UniLoaderImpl : UniLoader {
-    private lateinit var currentEnvironment: Environment
-    private lateinit var gameVersion: String
-    private val discoverer = ModDiscoverer()
-    private var loadingComplete = false
-
-    override fun getEnvironment() = currentEnvironment
-    override fun setEnvironment(environment: Environment) {
-        this.currentEnvironment = environment
+    companion object {
+        private val logger = LogManager.getLogger(UniLoader.NAME)
     }
-    override fun getGameVersion() = gameVersion
 
-    override fun getGameDir() = File(".")
-    override fun getLoaderDir() = File(getGameDir(), "UniLoader")
-    override fun getConfigDir() = File(getLoaderDir(), "config")
-    override fun getDataDir() = File(getLoaderDir(), "data")
-    override fun getModsDir() = File(getLoaderDir(), "mods")
+    private lateinit var currentEnvironment: Environment
+    override lateinit var gameVersion: String
+    private val discoverer = ModDiscoverer()
 
-    override fun isLoadingComplete() = loadingComplete
+    override var environment: Environment
+        get() = currentEnvironment
+        set(value) {
+            currentEnvironment = value
+        }
+
+    override val gameDir = File(".")
+    override val loaderDir = File(gameDir, "UniLoader")
+    override val configDir = File(loaderDir, "config")
+    override val dataDir = File(loaderDir, "data")
+    override val modsDir = File(loaderDir, "mods")
+
+    override var isLoadingComplete = false
     override fun load(argMap: ArgumentMap) {
-        gameVersion = argMap.getSingular("version")
+        println("Printing args...")
+        argMap.toArray().forEach(System.out::println)
+        when (currentEnvironment) {
+            Environment.CLIENT -> gameVersion = argMap.getSingular("version")
+            Environment.SERVER -> logger.warn("Server is not currently supported!")
+            else -> {
+                logger.error("How... How did you manage to do this..? (current environment is \"BOTH\")")
+                throw IllegalStateException("Weird environment... $currentEnvironment")
+            }
+        }
 
         discoverer.addFinder(ClasspathModFinder())
-        discoverer.addFinder(DirectoryModFinder(getModsDir()))
+        discoverer.addFinder(DirectoryModFinder(modsDir))
         discoverer.discover()
+
+        val mods = allMods
+        for (mod in mods) {
+            println("Mod ${mod.name} with ID ${mod.id} and version ${mod.version} was loaded successfully!")
+            val dependencies = mod.loader?.dependencies ?: continue
+            dependencies.forEach { dependency ->
+                if (mods.any {
+                    dependency.unless.contains(it.id)
+                }) return@forEach
+                if (dependency.only.isNotEmpty() && mods.none {
+                    dependency.only.contains(it.id)
+                }) return@forEach
+                if (mods.none {
+                    it.id.equals(dependency.id, true) && it.version <= dependency.version
+                }) throw MissingDependencyException("${mod.name} requires a mod with the ID ${dependency.id}, but that mod isn't present!")
+            }
+            println("${mod.name} dependencies: $dependencies")
+        }
 
         for (entrypoint in getEntrypoints<PreLaunchEntrypoint>("preLaunch")) {
             entrypoint.initialize(argMap)
         }
 
-        for (mod in discoverer.getMods()) {
-            println("Mod ${mod.name} with ID ${mod.id} and version ${mod.version} was loaded successfully!")
-        }
-
-        loadingComplete = true
+        isLoadingComplete = true
     }
 
     override fun getMod(id: String) = discoverer.getMods().firstOrNull {
         it.id.equals(id, true)
     } ?: throw IllegalArgumentException("Mod with ID \"$id\" is not present!")
 
-    override fun getAllMods() = discoverer.getMods()
+    override val allMods: List<ModMetadata>
+        get() = discoverer.getMods()
 
     override fun <T : Entrypoint> getEntrypoints(namespace: String): List<T> =
         EntrypointHandler.getEntrypoints(namespace)?.map { it as T } ?: emptyList()

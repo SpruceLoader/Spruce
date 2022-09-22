@@ -3,6 +3,7 @@ package xyz.unifycraft.uniloader.loader.impl.discoverer
 import com.google.gson.JsonObject
 import xyz.unifycraft.uniloader.loader.api.Environment
 import xyz.unifycraft.uniloader.loader.impl.metadata.*
+import xyz.unifycraft.uniloader.loader.impl.metadata.parser.VersionParser
 
 fun builtinMod(block: BuiltinModMetadata.() -> Unit) = BuiltinModMetadata()
     .apply(block)
@@ -38,7 +39,7 @@ class BuiltinModMetadata {
         schemaVersion = ModMetadata.CURRENT_SCHEMA_VERSION,
 
         name = name,
-        version = version,
+        version = VersionParser.parse(version),
         id = id,
         type = listOf(ModType.LIBRARY),
 
@@ -49,7 +50,6 @@ class BuiltinModMetadata {
         loader = LoaderData(
             environment = Environment.BOTH,
             accessWideners = emptyList(),
-            mixins = emptyList(),
             entrypoints = emptyMap(),
             dependencies = emptyList()
         ),

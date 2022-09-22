@@ -1,16 +1,18 @@
 package xyz.unifycraft.uniloader.loader.impl.transform
 
-import org.apache.logging.log4j.LogManager
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.ClassNode
-import org.objectweb.asm.tree.InsnList
 import org.objectweb.asm.tree.LdcInsnNode
-import org.objectweb.asm.tree.MethodInsnNode
+import xyz.unifycraft.uniloader.ulasm.insnList
+import xyz.unifycraft.uniloader.ulasm.transformers.BaseTransformer
+import xyz.unifycraft.uniloader.ulasm.utils.InsnHelper
+import xyz.unifycraft.uniloader.ulasm.utils.InvokeType
 
-object ClientEntrypointTransformer {
-    private val logger = LogManager.getLogger()
+object ClientEntrypointTransformer : BaseTransformer {
+    override fun getTarget() = "net.minecraft.client.MinecraftClient"
+    override fun transform(node: ClassNode): Boolean {
+        var modified = false
 
-    fun transform(node: ClassNode) {
         for (method in node.methods) {
             if (!method.name.equals("<init>")) continue
 
@@ -24,16 +26,13 @@ object ClientEntrypointTransformer {
                 if (cst.isNullOrBlank() || !cst.startsWith("Backend")) continue
 
                 val next = insn.next.next.next
-                println("next: $next")
-                method.instructions.insertBefore(next, makeHookList())
-                println("inserted")
+                method.instructions.insertBefore(next, insnList {
+                    list.add(InsnHelper.method(InvokeType.STATIC, Hooks::class.java, "handleClient", "()V"))
+                })
+                modified = true
             }
         }
-    }
 
-    private fun makeHookList(): InsnList {
-        val list = InsnList()
-        list.add(MethodInsnNode(Opcodes.INVOKESTATIC, Hooks.internalName, "handleClient", "()V", false))
-        return list
+        return modified
     }
 }

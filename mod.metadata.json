@@ -30,9 +30,6 @@
         "access_wideners": [
             "examplemod.accesswidener"
         ],
-        "mixins": [
-            "examplemod.mixins.json"
-        ],
         "entrypoints": [
             {
                 "type": "common",

@@ -1,12 +1,13 @@
 package xyz.unifycraft.uniloader.loader.impl.metadata
 
 import com.google.gson.JsonObject
+import xyz.unifycraft.uniloader.loader.api.metadata.Version
 
 data class ModMetadata(
     val schemaVersion: Int,
 
     val name: String?,
-    val version: String,
+    val version: Version,
     val id: String,
     val type: List<ModType>,
 

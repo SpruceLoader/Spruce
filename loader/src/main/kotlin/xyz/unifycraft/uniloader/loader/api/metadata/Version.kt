@@ -1,10 +1,10 @@
-package xyz.unifycraft.uniloader.loader.impl.metadata
+package xyz.unifycraft.uniloader.loader.api.metadata
 
 interface Version : Comparable<Version> {
     /**
      * @return A user-readable representation of this version.
      */
-    fun getReadableString(): String
+    val readableString: String
 
     /**
      * Version's companion objects should implement this so that
