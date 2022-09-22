@@ -3,8 +3,6 @@
 # [`UniLoader`]
 **The Minecraft mod loader that makes a difference.**
 
-### **THIS PROJECT IS STILL EXPERIMENTAL!**
-
 </div>
 
 ## What is this?
