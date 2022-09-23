@@ -15,7 +15,7 @@ dependencies {
 
     implementation("xyz.unifycraft:UniLaunchwrapper:1.0.2")
     implementation("org.ow2.asm:asm-tree:9.3")
-    implementation("xyz.unifycraft:ULASM:1.0.0-beta.10")
+    implementation("xyz.unifycraft:ULASM:1.0.0-beta.11")
 
     val log4j = "2.18.0"
     implementation("org.apache.logging.log4j:log4j-api:$log4j")
