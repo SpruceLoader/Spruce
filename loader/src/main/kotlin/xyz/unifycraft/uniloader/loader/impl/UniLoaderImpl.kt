@@ -38,8 +38,6 @@ class UniLoaderImpl : UniLoader {
 
     override var isLoadingComplete = false
     override fun load(argMap: ArgumentMap) {
-        println("Printing args...")
-        argMap.toArray().forEach(System.out::println)
         when (currentEnvironment) {
             Environment.CLIENT -> gameVersion = argMap.getSingular("version")
             Environment.SERVER -> logger.warn("Server is not currently supported!")
@@ -55,7 +53,7 @@ class UniLoaderImpl : UniLoader {
 
         val mods = allMods
         for (mod in mods) {
-            println("Mod ${mod.name} with ID ${mod.id} and version ${mod.version} was loaded successfully!")
+            println("Mod ${mod.name} with ID ${mod.id} and version ${mod.version.readableString} was loaded successfully!")
             val dependencies = mod.loader?.dependencies ?: continue
             dependencies.forEach { dependency ->
                 if (mods.any {
