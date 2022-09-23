@@ -6,10 +6,7 @@ import xyz.unifycraft.launchwrapper.api.EnvSide
 import xyz.unifycraft.launchwrapper.api.LaunchTransformer
 import xyz.unifycraft.uniloader.loader.api.Environment
 import xyz.unifycraft.uniloader.loader.api.UniLoader
-import xyz.unifycraft.uniloader.loader.impl.transform.BrandingTransformer
-import xyz.unifycraft.uniloader.loader.impl.transform.ClientEntrypointTransformer
-import xyz.unifycraft.uniloader.loader.impl.transform.ServerEntrypointTransformer
-import xyz.unifycraft.uniloader.loader.impl.transform.TransformerEntrypointTransformer
+import xyz.unifycraft.uniloader.loader.impl.transform.*
 import xyz.unifycraft.uniloader.ulasm.ULASM
 import xyz.unifycraft.uniloader.ulasm.transformers.BaseTransformer
 import xyz.unifycraft.uniloader.ulasm.transformers.Transformers
@@ -23,6 +20,7 @@ class LoaderLaunchTransformer : LaunchTransformer {
             transformers.add(ClientEntrypointTransformer)
             transformers.add(ServerEntrypointTransformer)
             transformers.add(TransformerEntrypointTransformer)
+            transformers.add(TitleScreenTransformer)
         }
     }
 
