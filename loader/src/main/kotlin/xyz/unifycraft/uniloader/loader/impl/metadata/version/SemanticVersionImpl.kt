@@ -35,7 +35,7 @@ class SemanticVersionImpl(
     override val readableString = buildString {
         append(major).append(".")
         append(minor).append(".")
-        append("patch")
+        append(patch)
         if (prerelease != null) append("-").append(prerelease)
         if (buildMetadata != null) append("+").append(buildMetadata)
 

@@ -79,8 +79,6 @@ object ModMetadataParser {
             reader.endObject()
         }
 
-        println("Loader: $loader")
-
         return ModMetadata(
             schemaVersion,
 
@@ -359,7 +357,6 @@ object ModMetadataParser {
                     reader.endArray()
                 }
                 "dependencies" -> {
-                    println("parsing dependencies")
                     if (token != JsonToken.BEGIN_ARRAY)
                         throw InvalidMetadataException("loader dependencies should be an array!")
 

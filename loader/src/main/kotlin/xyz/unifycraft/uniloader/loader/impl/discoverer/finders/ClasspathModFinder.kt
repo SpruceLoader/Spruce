@@ -24,7 +24,6 @@ class ClasspathModFinder : ModFinder {
             val url = modEnumeration.nextElement()
             try {
                 val path = fetchCodeSource(url, ModMetadata.FILE_NAME)
-                println("path: $path")
                 returnValue.add(path.toFile())
             } catch (e: Exception) {
                 logger.error("Failed to find location of ${ModMetadata.FILE_NAME} file from $url", e)
