@@ -13,7 +13,7 @@ object TitleScreenTransformer : BaseTransformer {
 
     override fun getTarget() = "net.minecraft.client.gui.screen.TitleScreen"
 
-    override fun transform(node: ClassNode?): Boolean {
+    override fun transform(node: ClassNode): Boolean {
         var modified = false
 
         val syncOpenWebsiteMethod = MethodNode(InsnHelper.ACC_PRIVATE + InsnHelper.ACC_SYNTHETIC, "syncOpenWebsite","(Lnet/minecraft/client/gui/widget/ButtonWidget;)V",null,null)
@@ -25,9 +25,9 @@ object TitleScreenTransformer : BaseTransformer {
             list.add(InsnNode(InsnHelper.RETURN))
         })
 
-        node?.methods?.add(syncOpenWebsiteMethod)
+        node.methods.add(syncOpenWebsiteMethod)
 
-        for (method in node?.methods!!) {
+        for (method in node.methods) {
             if (method.name != "init") continue
             val iterator = method.instructions.iterator()
             while (iterator.hasNext()) {
