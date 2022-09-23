@@ -1,7 +1,7 @@
 plugins {
     java
     kotlin("jvm")
-    id("xyz.unifycraft.uniloom") version("1.0.0-beta.18")
+    id("xyz.unifycraft.uniloom") version("1.0.0-beta.20")
 }
 
 group = extra["project.group"]?.toString()
