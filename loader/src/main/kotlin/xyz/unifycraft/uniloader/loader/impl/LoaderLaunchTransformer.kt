@@ -17,6 +17,7 @@ class LoaderLaunchTransformer : LaunchTransformer {
 
         init {
             transformers.add(BrandingTransformer)
+            transformers.add(TitleScreenTransformer)
             transformers.add(ClientEntrypointTransformer)
             transformers.add(ServerEntrypointTransformer)
             transformers.add(TransformerEntrypointTransformer)
@@ -32,7 +33,7 @@ class LoaderLaunchTransformer : LaunchTransformer {
     }
 
     override fun transform(className: String, rawClass: ByteArray): ByteArray {
-        val result = Transformers.invoke(className, rawClass, transformers)
+        val result = Transformers.invoke(className ,rawClass, transformers)
         ULASM.debug(result.isModified, className, result.bytes)
         return result.bytes
     }
