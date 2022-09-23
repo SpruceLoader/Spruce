@@ -17,10 +17,10 @@ class LoaderLaunchTransformer : LaunchTransformer {
 
         init {
             transformers.add(BrandingTransformer)
+            transformers.add(TitleScreenTransformer)
             transformers.add(ClientEntrypointTransformer)
             transformers.add(ServerEntrypointTransformer)
             transformers.add(TransformerEntrypointTransformer)
-            transformers.add(TitleScreenTransformer)
         }
     }
 
