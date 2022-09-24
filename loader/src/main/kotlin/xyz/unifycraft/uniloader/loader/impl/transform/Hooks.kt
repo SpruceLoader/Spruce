@@ -2,6 +2,7 @@ package xyz.unifycraft.uniloader.loader.impl.transform
 
 import org.apache.logging.log4j.LogManager
 import xyz.unifycraft.uniloader.api.ClientModEntrypoint
+import xyz.unifycraft.uniloader.api.ServerModEntrypoint
 import xyz.unifycraft.uniloader.loader.api.UniLoader
 
 @Suppress("unused")
@@ -22,6 +23,12 @@ object Hooks {
     @JvmStatic
     fun handleClient() {
         UniLoader.getInstance().getEntrypoints<ClientModEntrypoint>("client").forEach { entrypoint ->
+            entrypoint.initialize()
+        }
+    }
+    @JvmStatic
+    fun handleServer() {
+        UniLoader.getInstance().getEntrypoints<ServerModEntrypoint>("server").forEach { entrypoint ->
             entrypoint.initialize()
         }
     }

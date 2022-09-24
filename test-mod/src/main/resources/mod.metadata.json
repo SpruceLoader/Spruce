@@ -26,6 +26,10 @@
             {
                 "type": "client",
                 "value": "xyz.deftu.testmod.TestModClient"
+            },
+            {
+                "type": "server",
+                "value": "xyz.deftu.testmod.TestModServer"
             }
         ]
     },
