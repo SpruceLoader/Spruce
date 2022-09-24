@@ -27,12 +27,14 @@ object Hooks {
         }
     }
     @JvmStatic
+    
     fun handleServer() {
         UniLoader.getInstance().getEntrypoints<ServerModEntrypoint>("server").forEach { entrypoint ->
             entrypoint.initialize()
         }
     }
     @JvmStatic
+
     fun openWebsite() {
         println("*OPENS WEBITE*")
     }
