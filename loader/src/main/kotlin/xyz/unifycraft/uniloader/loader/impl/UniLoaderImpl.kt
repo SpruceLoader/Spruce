@@ -1,5 +1,8 @@
 package xyz.unifycraft.uniloader.loader.impl
 
+import com.google.gson.Gson
+import com.google.gson.JsonObject
+import com.google.gson.stream.JsonReader
 import org.apache.logging.log4j.LogManager
 import xyz.unifycraft.launchwrapper.api.ArgumentMap
 import xyz.unifycraft.uniloader.api.Entrypoint
@@ -13,7 +16,12 @@ import xyz.unifycraft.uniloader.loader.impl.discoverer.finders.DirectoryModFinde
 import xyz.unifycraft.uniloader.loader.impl.entrypoints.EntrypointHandler
 import xyz.unifycraft.uniloader.loader.impl.metadata.ModMetadata
 import java.io.File
+import java.io.FileReader
+import java.io.InputStreamReader
+import java.io.StringReader
 import java.lang.IllegalArgumentException
+import java.nio.file.Files
+import java.nio.file.Paths
 
 class UniLoaderImpl : UniLoader {
     companion object {
@@ -38,14 +46,16 @@ class UniLoaderImpl : UniLoader {
 
     override var isLoadingComplete = false
     override fun load(argMap: ArgumentMap) {
-        when (currentEnvironment) {
-            Environment.CLIENT -> gameVersion = argMap.getSingular("version")
-            Environment.SERVER -> logger.warn("Server is not currently supported!")
-            else -> {
-                logger.error("How... How did you manage to do this..? (current environment is \"BOTH\")")
-                throw IllegalStateException("Weird environment... $currentEnvironment")
-            }
+        println("Printing args...")
+        argMap.toArray().forEach(System.out::println)
+
+        if (currentEnvironment == Environment.BOTH) {
+            logger.error("How... How did you manage to do this..? (current environment is \"BOTH\")")
+            throw IllegalStateException("Weird environment... $currentEnvironment")
         }
+
+        //FIXME: Make this look better (trust me its way better then before)
+        gameVersion = Gson().fromJson(InputStreamReader(javaClass.classLoader.getResourceAsStream("version.json")!!),MinecraftVersion::class.java).id
 
         discoverer.addFinder(ClasspathModFinder())
         discoverer.addFinder(DirectoryModFinder(modsDir))
@@ -53,7 +63,7 @@ class UniLoaderImpl : UniLoader {
 
         val mods = allMods
         for (mod in mods) {
-            println("Mod ${mod.name} with ID ${mod.id} and version ${mod.version.readableString} was loaded successfully!")
+            println("Mod ${mod.name} with ID ${mod.id} and version ${mod.version} was loaded successfully!")
             val dependencies = mod.loader?.dependencies ?: continue
             dependencies.forEach { dependency ->
                 if (mods.any {
