@@ -3,6 +3,7 @@ package xyz.unifycraft.uniloader.loader.api
 import xyz.unifycraft.launchwrapper.api.ArgumentMap
 import xyz.unifycraft.uniloader.api.Entrypoint
 import xyz.unifycraft.uniloader.loader.impl.UniLoaderImpl
+import xyz.unifycraft.uniloader.loader.impl.game.MinecraftVersion
 import xyz.unifycraft.uniloader.loader.impl.metadata.ModMetadata
 import java.io.File
 
@@ -28,7 +29,7 @@ interface UniLoader {
     /**
      * @return The current Minecraft version which is being played on.
      */
-    val gameVersion: String
+    val gameVersion: MinecraftVersion
 
     /**
      * @return The base directory that the game launches in.

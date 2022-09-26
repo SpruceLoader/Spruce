@@ -1,27 +1,25 @@
 package xyz.unifycraft.uniloader.loader.impl
 
 import com.google.gson.Gson
-import com.google.gson.JsonObject
-import com.google.gson.stream.JsonReader
 import org.apache.logging.log4j.LogManager
+import xyz.unifycraft.launchwrapper.Launch
 import xyz.unifycraft.launchwrapper.api.ArgumentMap
 import xyz.unifycraft.uniloader.api.Entrypoint
 import xyz.unifycraft.uniloader.api.PreLaunchEntrypoint
 import xyz.unifycraft.uniloader.loader.api.Environment
 import xyz.unifycraft.uniloader.loader.api.UniLoader
+import xyz.unifycraft.uniloader.loader.exceptions.InvalidMetadataException
 import xyz.unifycraft.uniloader.loader.exceptions.MissingDependencyException
 import xyz.unifycraft.uniloader.loader.impl.discoverer.ModDiscoverer
 import xyz.unifycraft.uniloader.loader.impl.discoverer.finders.ClasspathModFinder
 import xyz.unifycraft.uniloader.loader.impl.discoverer.finders.DirectoryModFinder
 import xyz.unifycraft.uniloader.loader.impl.entrypoints.EntrypointHandler
+import xyz.unifycraft.uniloader.loader.impl.game.MinecraftVersion
+import xyz.unifycraft.uniloader.loader.impl.game.MinecraftVersionParser
 import xyz.unifycraft.uniloader.loader.impl.metadata.ModMetadata
 import java.io.File
-import java.io.FileReader
 import java.io.InputStreamReader
-import java.io.StringReader
 import java.lang.IllegalArgumentException
-import java.nio.file.Files
-import java.nio.file.Paths
 
 class UniLoaderImpl : UniLoader {
     companion object {
@@ -29,7 +27,7 @@ class UniLoaderImpl : UniLoader {
     }
 
     private lateinit var currentEnvironment: Environment
-    override lateinit var gameVersion: String
+    override lateinit var gameVersion: MinecraftVersion
     private val discoverer = ModDiscoverer()
 
     override var environment: Environment
@@ -54,8 +52,7 @@ class UniLoaderImpl : UniLoader {
             throw IllegalStateException("Weird environment... $currentEnvironment")
         }
 
-        //FIXME: Make this look better (trust me its way better then before)
-        gameVersion = Gson().fromJson(InputStreamReader(javaClass.classLoader.getResourceAsStream("version.json")!!),MinecraftVersion::class.java).id
+        gameVersion = MinecraftVersionParser.parse(Launch.getInstance().classLoader.getResourceAsStream("version.json")?.readBytes()?.decodeToString() ?: throw InvalidMetadataException("Couldn't determine Minecraft version?"))
 
         discoverer.addFinder(ClasspathModFinder())
         discoverer.addFinder(DirectoryModFinder(modsDir))
@@ -63,7 +60,7 @@ class UniLoaderImpl : UniLoader {
 
         val mods = allMods
         for (mod in mods) {
-            println("Mod ${mod.name} with ID ${mod.id} and version ${mod.version} was loaded successfully!")
+            println("Mod ${mod.name} with ID ${mod.id} and version ${mod.version.readableString} was loaded successfully!")
             val dependencies = mod.loader?.dependencies ?: continue
             dependencies.forEach { dependency ->
                 if (mods.any {

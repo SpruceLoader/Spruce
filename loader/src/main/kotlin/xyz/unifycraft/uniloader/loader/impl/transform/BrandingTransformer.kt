@@ -17,8 +17,6 @@ object BrandingTransformer : BaseTransformer {
     override fun transform(node: ClassNode): Boolean {
         var modified = false
 
-        println("Branding ...")
-
         for (method in node.methods) {
             if ((method.name.equals("getClientModName") || method.name.equals("getServerModName")) && method.desc.endsWith(")Ljava/lang/String;")) {
                 val iterator = method.instructions.iterator()
