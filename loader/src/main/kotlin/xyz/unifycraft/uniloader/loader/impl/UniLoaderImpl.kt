@@ -1,6 +1,5 @@
 package xyz.unifycraft.uniloader.loader.impl
 
-import com.google.gson.Gson
 import org.apache.logging.log4j.LogManager
 import xyz.unifycraft.launchwrapper.Launch
 import xyz.unifycraft.launchwrapper.api.ArgumentMap
@@ -10,6 +9,8 @@ import xyz.unifycraft.uniloader.loader.api.Environment
 import xyz.unifycraft.uniloader.loader.api.UniLoader
 import xyz.unifycraft.uniloader.loader.exceptions.InvalidMetadataException
 import xyz.unifycraft.uniloader.loader.exceptions.MissingDependencyException
+import xyz.unifycraft.uniloader.loader.impl.config.LoaderConfig
+import xyz.unifycraft.uniloader.loader.impl.config.LoaderConfigParser
 import xyz.unifycraft.uniloader.loader.impl.discoverer.ModDiscoverer
 import xyz.unifycraft.uniloader.loader.impl.discoverer.finders.ClasspathModFinder
 import xyz.unifycraft.uniloader.loader.impl.discoverer.finders.DirectoryModFinder
@@ -18,7 +19,6 @@ import xyz.unifycraft.uniloader.loader.impl.game.MinecraftVersion
 import xyz.unifycraft.uniloader.loader.impl.game.MinecraftVersionParser
 import xyz.unifycraft.uniloader.loader.impl.metadata.ModMetadata
 import java.io.File
-import java.io.InputStreamReader
 import java.lang.IllegalArgumentException
 
 class UniLoaderImpl : UniLoader {
@@ -42,16 +42,21 @@ class UniLoaderImpl : UniLoader {
     override val dataDir = File(loaderDir, "data")
     override val modsDir = File(loaderDir, "mods")
 
+    override lateinit var loaderConfig: LoaderConfig
     override var isLoadingComplete = false
-    override fun load(argMap: ArgumentMap) {
-        println("Printing args...")
-        argMap.toArray().forEach(System.out::println)
 
+    override fun load(argMap: ArgumentMap) {
         if (currentEnvironment == Environment.BOTH) {
             logger.error("How... How did you manage to do this..? (current environment is \"BOTH\")")
             throw IllegalStateException("Weird environment... $currentEnvironment")
         }
 
+        loaderConfig = LoaderConfigParser.parse(File(loaderDir, "config.json").apply {
+            if (!exists()) {
+                createNewFile()
+                writeText(LoaderConfig.serialize(LoaderConfig.DEFAULT))
+            }
+        }.readText())
         gameVersion = MinecraftVersionParser.parse(Launch.getInstance().classLoader.getResourceAsStream("version.json")?.readBytes()?.decodeToString() ?: throw InvalidMetadataException("Couldn't determine Minecraft version?"))
 
         discoverer.addFinder(ClasspathModFinder())

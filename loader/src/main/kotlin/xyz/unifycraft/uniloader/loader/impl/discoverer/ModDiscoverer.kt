@@ -68,7 +68,7 @@ class ModDiscoverer {
     private fun loadBuiltInMods() {
         mods.add(builtinMod {
             name = "Minecraft"
-            version = UniLoader.getInstance().gameVersion
+            version = UniLoader.getInstance().gameVersion.id
             id = "minecraft"
 
             license {

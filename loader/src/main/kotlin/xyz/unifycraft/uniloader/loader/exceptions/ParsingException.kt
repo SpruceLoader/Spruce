@@ -1,5 +1,5 @@
 package xyz.unifycraft.uniloader.loader.exceptions
 
-class GeneralParsingException(
+class ParsingException(
     message: String
 ) : RuntimeException(message)

@@ -3,6 +3,7 @@ package xyz.unifycraft.uniloader.loader.api
 import xyz.unifycraft.launchwrapper.api.ArgumentMap
 import xyz.unifycraft.uniloader.api.Entrypoint
 import xyz.unifycraft.uniloader.loader.impl.UniLoaderImpl
+import xyz.unifycraft.uniloader.loader.impl.config.LoaderConfig
 import xyz.unifycraft.uniloader.loader.impl.game.MinecraftVersion
 import xyz.unifycraft.uniloader.loader.impl.metadata.ModMetadata
 import java.io.File
@@ -60,6 +61,10 @@ interface UniLoader {
      * used in internals.
      */
     val isLoadingComplete: Boolean
+    /**
+     * @return The config for the loader itself.
+     */
+    val loaderConfig: LoaderConfig
     /**
      * Loads all mods in the classpath, mods directory and command-line
      * into the game using our custom class loader.
