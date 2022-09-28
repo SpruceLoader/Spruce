@@ -1,6 +1,5 @@
 package xyz.deftu.testmod;
 
-import net.minecraft.client.MinecraftClient;
 import xyz.unifycraft.uniloader.api.ClientModEntrypoint;
 
 public class TestModClient implements ClientModEntrypoint {

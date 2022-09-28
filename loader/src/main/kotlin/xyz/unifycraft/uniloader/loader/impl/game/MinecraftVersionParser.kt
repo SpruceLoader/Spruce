@@ -1,18 +1,13 @@
 package xyz.unifycraft.uniloader.loader.impl.game
 
 import com.google.gson.stream.JsonReader
-import com.google.gson.stream.JsonToken
-import org.apache.logging.log4j.LogManager
 import xyz.unifycraft.uniloader.loader.exceptions.ParsingException
-import xyz.unifycraft.uniloader.loader.impl.config.LoaderConfigParser
-import java.io.StringReader
+import xyz.unifycraft.uniloader.loader.impl.utils.*
 import java.time.Instant
 import java.util.*
 
-object MinecraftVersionParser {
-    private val logger = LogManager.getLogger("Loader Config Parser")
-
-    fun parse(input: String): MinecraftVersion {
+object MinecraftVersionParser : Parser<MinecraftVersion> {
+    override fun parse(input: String): MinecraftVersion {
         var id: String? = null
         var name: String? = null
         var releaseTarget: String? = null
@@ -25,82 +20,29 @@ object MinecraftVersionParser {
         var javaVersion: Int? = null
         var stable: Boolean? = null
 
-        JsonReader(StringReader(input)).use { reader ->
-            val token = reader.peek()
-            if (token != JsonToken.BEGIN_OBJECT)
-                throw ParsingException("Minecraft version does not appear to be a JSON object!")
+        input.readJson { token ->
+            requireObject("Minecraft version")
 
-            reader.beginObject()
-
-
-            var currentName = ""
-            while (reader.hasNext()) {
-                val token = reader.peek()
-                if (token == JsonToken.NAME) {
-                    currentName = reader.nextName()
-                    continue
-                }
-
+            forEachItemObject { token, currentName ->
                 when (currentName) {
-                    "id" -> {
-                        if (token != JsonToken.STRING)
-                            throw ParsingException("Minecraft version ID isn't a string?")
-                        id = reader.nextString()
-                    }
-                    "name" -> {
-                        if (token != JsonToken.STRING)
-                            throw ParsingException("Minecraft version name isn't a string?")
-                        name = reader.nextString()
-                    }
-                    "release_target" -> {
-                        if (token != JsonToken.STRING)
-                            throw ParsingException("Minecraft version release target isn't a string?")
-                        releaseTarget = reader.nextString()
-                    }
-                    "world_version" -> {
-                        if (token != JsonToken.NUMBER)
-                            throw ParsingException("Minecraft version's world version isn't an integer?")
-                        worldVersion = reader.nextInt()
-                    }
-                    "series_id" -> {
-                        if (token != JsonToken.STRING)
-                            throw ParsingException("Minecraft version series ID isn't a string?")
-                        seriesId = reader.nextString()
-                    }
-                    "protocol_version" -> {
-                        if (token != JsonToken.NUMBER)
-                            throw ParsingException("Minecraft version's protocol version isn't an integer?")
-                        protocolVersion = reader.nextInt()
-                    }
-                    "pack_version" -> packVersion = readPackVersion(reader, token)
-                    "build_time" -> {
-                        if (token != JsonToken.STRING)
-                            throw ParsingException("Minecraft version's build time isn't a string?")
-                        buildTime = Date.from(Instant.parse(reader.nextString()))
-                    }
-                    "java_component" -> {
-                        if (token != JsonToken.STRING)
-                            throw ParsingException("Minecraft version's Java component isn't a string?")
-                        javaComponent = reader.nextString()
-                    }
-                    "java_version" -> {
-                        if (token != JsonToken.NUMBER)
-                            throw ParsingException("Minecraft version's Java version isn't an integer?")
-                        javaVersion = reader.nextInt()
-                    }
-                    "stable" -> {
-                        if (token != JsonToken.BOOLEAN)
-                            throw ParsingException("Minecraft version's stable state isn't a boolean?")
-                        stable = reader.nextBoolean()
-                    }
-                    else -> {
-                        logger.warn("Unknown value found - skipping. ($currentName)")
-                        reader.skipValue()
-                    }
+                    "id" -> id = readString("id")
+                    "name" -> name = readString("name")
+                    "release_target" -> releaseTarget = readString("release_target")
+                    "world_version" -> worldVersion = readInt("world_version")
+                    "series_id" -> seriesId = readString("series_id")
+                    "protocol_version" -> protocolVersion = readInt("protocol_version")
+                    "pack_version" -> packVersion = readPackVersion()
+                    "build_time" -> buildTime = Date.from(Instant.parse(readString("build_time")))
+                    "java_component" -> javaComponent = readString("java_component")
+                    "java_version" -> javaVersion = readInt("java_version")
+                    "stable" -> stable = readBool("stable")
+                    else -> return@forEachItemObject true
                 }
+
+                false
             }
 
-            reader.endObject()
+            endObject()
         }
 
         return MinecraftVersion(
@@ -118,39 +60,23 @@ object MinecraftVersionParser {
         )
     }
 
-    private fun readPackVersion(reader: JsonReader, token: JsonToken): PackVersion {
-        if (token != JsonToken.BEGIN_OBJECT)
-            throw ParsingException("Pack version should be an object?")
+    private fun JsonReader.readPackVersion(): PackVersion {
+        requireObject("Pack version")
 
         var resource: Int? = null
         var data: Int? = null
 
-        reader.beginObject()
-
-        var currentName = ""
-        while (reader.hasNext()) {
-            val token = reader.peek()
-            if (token == JsonToken.NAME) {
-                currentName = reader.nextName()
-                continue
+        forEachItemObject { _, name ->
+            when (name) {
+                "resource" -> resource = readInt("resource")
+                "data" -> data = readInt("data")
+                else -> return@forEachItemObject true
             }
 
-            when (currentName) {
-                "resource" -> {
-                    if (token != JsonToken.NUMBER)
-                        throw ParsingException("Pack version's resource isn't an integer?")
-                    resource = reader.nextInt()
-                }
-                "data" -> {
-                    if (token != JsonToken.NUMBER)
-                        throw ParsingException("Pack version's data isn't an integer?")
-                    data = reader.nextInt()
-                }
-                else -> reader.skipValue()
-            }
+            false
         }
 
-        reader.endObject()
+        endObject()
 
         return PackVersion(
             resource ?: throw ParsingException("Resource couldn't be found."),

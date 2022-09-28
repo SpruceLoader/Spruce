@@ -55,7 +55,7 @@ class ModDiscoverer {
             } else continue
         }
 
-        this.mods.addAll(rawMetadata.map(ModMetadataParser::read))
+        this.mods.addAll(rawMetadata.map(ModMetadataParser::parse))
         EntrypointHandler.initialize(this)
 
         logger.info("Discovered ${mods.size} mods in ${System.currentTimeMillis() - startTime}ms.")

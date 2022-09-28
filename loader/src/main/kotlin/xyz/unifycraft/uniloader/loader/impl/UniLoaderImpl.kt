@@ -61,6 +61,7 @@ class UniLoaderImpl : UniLoader {
 
         discoverer.addFinder(ClasspathModFinder())
         discoverer.addFinder(DirectoryModFinder(modsDir))
+        loaderConfig.modDirs.forEach { discoverer.addFinder(DirectoryModFinder(it)) }
         discoverer.discover()
 
         val mods = allMods

@@ -8,12 +8,10 @@ import xyz.unifycraft.uniloader.loader.api.Environment
 import xyz.unifycraft.uniloader.loader.api.metadata.Version
 import xyz.unifycraft.uniloader.loader.exceptions.InvalidMetadataException
 import xyz.unifycraft.uniloader.loader.impl.metadata.*
-import java.io.StringReader
+import xyz.unifycraft.uniloader.loader.impl.utils.*
 
-object ModMetadataParser {
-
-    @JvmStatic
-    fun read(jsonInput: String): ModMetadata {
+object ModMetadataParser : Parser<ModMetadata> {
+    override fun parse(input: String): ModMetadata {
         var schemaVersion = ModMetadata.CURRENT_SCHEMA_VERSION
 
         var name: String? = null
@@ -30,53 +28,28 @@ object ModMetadataParser {
 
         var additional = JsonObject()
 
-        JsonReader(StringReader(jsonInput)).use { reader ->
-            val token = reader.peek()
-            if (token != JsonToken.BEGIN_OBJECT)
-                throw InvalidMetadataException("Metadata file must be a JSON object!")
+        input.readJson {
+            requireObject("Mod metadata")
 
-            reader.beginObject()
-
-            var currentName = ""
-            while (reader.hasNext()) {
-                val token = reader.peek()
-                if (token == JsonToken.NAME) {
-                    currentName = reader.nextName()
-                    continue
-                }
-
+            forEachItemObject { token, currentName ->
                 when (currentName) {
-                    "schema_version" -> {
-                        if (token != JsonToken.NUMBER)
-                            throw InvalidMetadataException("schema_version should be a number!")
-                        schemaVersion = reader.nextInt()
-                    }
-                    "name" -> {
-                        if (token != JsonToken.STRING)
-                            throw InvalidMetadataException("name should be a string!")
-                        name = reader.nextString()
-                    }
-                    "version" -> {
-                        if (token != JsonToken.STRING)
-                            throw InvalidMetadataException("version should be a string!")
-                        version = VersionParser.parse(reader.nextString())
-                    }
-                    "id" -> {
-                        if (token != JsonToken.STRING)
-                            throw InvalidMetadataException("id should be a string!")
-                        id = reader.nextString()
-                    }
-                    "type" -> readTypes(type, reader, token)
-                    "license" -> license = readLicense(reader, token)
-                    "contributors" -> readContributors(contributors, reader, token)
-                    "links" -> links = readLinks(reader, token)
-                    "loader" -> loader = readLoader(reader, token)
-                    "additional" -> readAdditional(additional, reader, token)
-                    else -> reader.skipValue()
+                    "schema_version" -> schemaVersion = readInt("schema_version")
+                    "name" -> name = readString("name")
+                    "version" -> version = VersionParser.parse(readString("version"))
+                    "id" -> id = readString("id")
+                    "type" -> type.addAll(readTypes(token))
+                    "license" -> license = readLicense()
+                    "contributors" -> contributors.addAll(readContributors())
+                    "links" -> links = readLinks()
+                    "loader" -> loader = readLoader()
+                    "additional" -> readAdditional(additional)
+                    else -> return@forEachItemObject true
                 }
+
+                false
             }
 
-            reader.endObject()
+            endObject()
         }
 
         return ModMetadata(
@@ -97,64 +70,45 @@ object ModMetadataParser {
         )
     }
 
-    private fun readTypes(value: MutableList<ModType>, reader: JsonReader, token: JsonToken) {
+    private fun JsonReader.readTypes(token: JsonToken): List<ModType> {
         fun determineTypeFrom(input: String) = ModType.values().firstOrNull {
             it.name.equals(input, true)
         } ?: throw InvalidMetadataException("Invalid mod type entered!")
 
-        value.clear()
-
         when (token) {
-            JsonToken.STRING -> value.add(determineTypeFrom(reader.nextString()))
+            JsonToken.STRING -> return listOf(determineTypeFrom(nextString()))
             JsonToken.BEGIN_ARRAY -> {
-                reader.beginArray()
+                beginArray()
 
-                while (reader.hasNext()) {
-                    val token = reader.peek()
-                    if (token != JsonToken.STRING)
-                        throw InvalidMetadataException("type should be a string!")
-
-                    value.add(determineTypeFrom(reader.nextString()))
+                val value = mutableListOf<ModType>()
+                forEachItemArray { token ->
+                    value.add(determineTypeFrom(readString("Mod type")))
+                    false
                 }
 
-                reader.endArray()
+                endArray()
+                return value
             }
             else -> throw InvalidMetadataException("type should be a string or an array!")
         }
     }
 
-    private fun readLicense(reader: JsonReader, token: JsonToken): License {
-        if (token != JsonToken.BEGIN_OBJECT)
-            throw InvalidMetadataException("license should be an object!")
+    private fun JsonReader.readLicense(): License {
+        requireObject("Mod license")
 
         var licenseName = ""
         var licenseUrl: String? = null
 
-        reader.beginObject()
-
-        var currentName = ""
-        while (reader.hasNext()) {
-            val token = reader.peek()
-            if (token == JsonToken.NAME) {
-                currentName = reader.nextName()
-                continue
+        forEachItemObject { token, name ->
+            when (name) {
+                "name", "display_name" -> licenseName = readString("name/display_name")
+                "url" -> licenseUrl = readString("url")
             }
 
-            when (currentName) {
-                "name", "display_name" -> {
-                    if (token != JsonToken.STRING)
-                        throw InvalidMetadataException("license name/display name should be a string!")
-                    licenseName = reader.nextString()
-                }
-                "url", "link" -> {
-                    if (token != JsonToken.STRING)
-                        throw InvalidMetadataException("license url/link should be a string!")
-                    licenseUrl = reader.nextString()
-                }
-            }
+            false
         }
 
-        reader.endObject()
+        endObject()
 
         if (licenseName.isBlank())
             throw InvalidMetadataException("license name/display_name must be present!")
@@ -162,328 +116,207 @@ object ModMetadataParser {
         return License(licenseName, licenseUrl)
     }
 
-    private fun readContributors(value: MutableList<Contributor>, reader: JsonReader, token: JsonToken) {
-        if (token != JsonToken.BEGIN_ARRAY)
-            throw InvalidMetadataException("contributors should be an array!")
+    private fun JsonReader.readContributors(): List<Contributor> {
+        requireArray("Mod contributors")
+        val value = mutableListOf<Contributor>()
 
-        reader.beginArray()
-        while (reader.hasNext()) {
-            val token = reader.peek()
-            if (token != JsonToken.BEGIN_OBJECT)
-                throw InvalidMetadataException("contributor should be an object!")
-
-            reader.beginObject()
+        forEachItemArray {
+            requireObject("Mod contributor")
 
             var contributorName = ""
             var contributorRole = ""
 
-            var currentName = ""
-            while (reader.hasNext()) {
-                val token = reader.peek()
-                if (token == JsonToken.NAME) {
-                    currentName = reader.nextName()
-                    continue
+            forEachItemObject { token, name ->
+                when (name) {
+                    "name" -> contributorName = readString("name")
+                    "role" -> contributorRole = readString("role")
+                    else -> return@forEachItemObject true
                 }
 
-                when (currentName) {
-                    "name" -> {
-                        if (token != JsonToken.STRING)
-                            throw InvalidMetadataException("contributor name should be a string!")
-                        contributorName = reader.nextString()
-                    }
-                    "role" -> {
-                        if (token != JsonToken.STRING)
-                            throw InvalidMetadataException("contributor role should be a string!")
-                        contributorRole = reader.nextString()
-                    }
-                }
+                false
             }
 
-            reader.endObject()
+            endObject()
 
             if (contributorName.isBlank())
                 throw InvalidMetadataException("contributor name must be present!")
             if (contributorRole.isBlank())
                 throw InvalidMetadataException("contributor role must be present!")
-
             value.add(Contributor(contributorName, contributorRole))
+
+            false
         }
 
-        reader.endArray()
+        endArray()
+        return value
     }
 
-    private fun readLinks(reader: JsonReader, token: JsonToken): ModLinks {
-        if (token != JsonToken.BEGIN_OBJECT)
-            throw InvalidMetadataException("links should be an object!")
+    private fun JsonReader.readLinks(): ModLinks {
+        requireObject("Mod links")
 
         var linksHome: String? = null
         var linksSource: String? = null
         var linksIssues: String? = null
         var linksDiscord: String? = null
 
-        reader.beginObject()
-
-        var currentName = ""
-        while (reader.hasNext()) {
-            val token = reader.peek()
-            if (token == JsonToken.NAME) {
-                currentName = reader.nextName()
-                continue
+        forEachItemObject { token, name ->
+            when (name) {
+                "home" -> linksHome = readString("home")
+                "source" -> linksSource = readString("source")
+                "issues" -> linksIssues = readString("issues")
+                "discord" -> linksDiscord = readString("discord")
+                else -> return@forEachItemObject true
             }
 
-            when (currentName) {
-                "home" -> {
-                    if (token != JsonToken.STRING)
-                        throw InvalidMetadataException("links home should be a string!")
-                    linksHome = reader.nextString()
-                }
-                "source" -> {
-                    if (token != JsonToken.STRING)
-                        throw InvalidMetadataException("links source should be a string!")
-                    linksSource = reader.nextString()
-                }
-                "issues" -> {
-                    if (token != JsonToken.STRING)
-                        throw InvalidMetadataException("links issues should be a string!")
-                    linksIssues = reader.nextString()
-                }
-                "discord" -> {
-                    if (token != JsonToken.STRING)
-                        throw InvalidMetadataException("links discord should be a string!")
-                    linksDiscord = reader.nextString()
-                }
-            }
+            false
         }
 
-        reader.endObject()
+        endObject()
         return ModLinks(linksHome, linksSource, linksIssues, linksDiscord)
     }
 
-    private fun readLoader(reader: JsonReader, token: JsonToken): LoaderData {
-        if (token != JsonToken.BEGIN_OBJECT)
-            throw InvalidMetadataException("loader should be an object!")
+    private fun JsonReader.readLoader(): LoaderData {
+        requireObject("Mod loader data")
 
         var environment = Environment.BOTH
-        val accessWideners = mutableListOf<String>()
         val entrypoints = mutableMapOf<String, EntrypointMetadata>()
         val dependencies = mutableListOf<Dependency>()
 
-        reader.beginObject()
-
-        var currentName = ""
-        while (reader.hasNext()) {
-            val token = reader.peek()
-            if (token == JsonToken.NAME) {
-                currentName = reader.nextName()
-                continue
-            }
-
-            when (currentName) {
+        forEachItemObject { token, name ->
+            when (name) {
                 "env", "environment" -> {
-                    if (token != JsonToken.STRING)
-                        throw InvalidMetadataException("loader env/environment should be a string!")
-                    var value = reader.nextString()
+                    var value = readString("environment")
                     if (value == "*")
                         value = "both"
                     environment = Environment.values().first { it.name.equals(value, true) }
                 }
-                "access_wideners" -> {
-                    when (token) {
-                        JsonToken.STRING -> accessWideners.add(reader.nextString())
-                        JsonToken.BEGIN_ARRAY -> {
-                            reader.beginArray()
-
-                            while (reader.hasNext()) {
-                                val token = reader.peek()
-                                if (token != JsonToken.STRING)
-                                    throw InvalidMetadataException("loader access wideners only accepts strings!")
-                                accessWideners.add(reader.nextString())
-                            }
-
-                            reader.endArray()
-                        }
-                        else -> throw InvalidMetadataException("loader access wideners should either be a string or an array!")
-                    }
-                }
                 "entrypoints" -> {
-                    if (token != JsonToken.BEGIN_ARRAY)
-                        throw InvalidMetadataException("loader entrypoints should be an array!")
+                    requireArray("Mod entrypoints")
 
-                    reader.beginArray()
-
-                    while (reader.hasNext()) {
-                        val token = reader.peek()
-                        if (token != JsonToken.BEGIN_OBJECT)
-                            throw InvalidMetadataException("loader entrypoint should be an object!")
+                    forEachItemArray {
+                        beginObject()
 
                         var entrypointType = ""
                         var entrypointValue = ""
                         var entrypointAdapter: String? = null
 
-                        reader.beginObject()
-
-                        var currentName = ""
-                        while (reader.hasNext()) {
-                            val token = reader.peek()
-                            if (token == JsonToken.NAME) {
-                                currentName = reader.nextName()
-                                continue
+                        forEachItemObject { token, name ->
+                            when (name) {
+                                "type" -> entrypointType = readString("type")
+                                "value" -> entrypointValue = readString("value")
+                                "adapter" -> entrypointAdapter = readString("adapter")
+                                else -> return@forEachItemObject true
                             }
 
-                            when (currentName) {
-                                "type" -> {
-                                    if (token != JsonToken.STRING)
-                                        throw InvalidMetadataException("entrypoint type should be a string!")
-                                    entrypointType = reader.nextString()
-                                }
-                                "value" -> {
-                                    if (token != JsonToken.STRING)
-                                        throw InvalidMetadataException("entrypoint value should be a string!")
-                                    entrypointValue = reader.nextString()
-                                }
-                                "adapter" -> {
-                                    if (token != JsonToken.STRING)
-                                        throw InvalidMetadataException("entrypoint adapter should be a string!")
-                                    entrypointAdapter = reader.nextString()
-                                }
-                            }
+                            false
                         }
 
-                        reader.endObject()
-
                         entrypoints[entrypointType] = EntrypointMetadata(entrypointAdapter, entrypointValue)
+                        endObject()
+                        false
                     }
 
-                    reader.endArray()
+                    endArray()
                 }
                 "dependencies" -> {
-                    if (token != JsonToken.BEGIN_ARRAY)
-                        throw InvalidMetadataException("loader dependencies should be an array!")
+                    requireArray("Mod dependencies")
 
-                    reader.beginArray()
-
-                    while (reader.hasNext()) {
-                        val token = reader.peek()
-                        if (token != JsonToken.BEGIN_OBJECT)
-                            throw InvalidMetadataException("loader entrypoint should be an object!")
+                    forEachItemArray {
+                        requireObject("Mod dependency")
 
                         var dependencyId = ""
                         var dependencyVersion: Version? = null
                         val dependencyUnless = mutableListOf<String>()
                         val dependencyOnly = mutableListOf<String>()
 
-                        reader.beginObject()
-
-                        var currentName = ""
-                        while (reader.hasNext()) {
-                            val token = reader.peek()
-                            if (token == JsonToken.NAME) {
-                                currentName = reader.nextName()
-                                continue
-                            }
-
-                            when (currentName) {
-                                "id" -> {
-                                    if (token != JsonToken.STRING)
-                                        throw InvalidMetadataException("dependency id should be a string!")
-                                    dependencyId = reader.nextString()
-                                }
-                                "version" -> {
-                                    if (token != JsonToken.STRING)
-                                        throw InvalidMetadataException("dependency version should be a string!")
-                                    dependencyVersion = VersionParser.parse(reader.nextString())
-                                }
+                        forEachItemObject { token, name ->
+                            when (name) {
+                                "id" -> dependencyId = readString("id")
+                                "version" -> dependencyVersion = VersionParser.parse(readString("version"))
                                 "unless" -> {
                                     when (token) {
-                                        JsonToken.STRING -> dependencyUnless.add(reader.nextString())
+                                        JsonToken.STRING -> dependencyUnless.add(readString())
                                         JsonToken.BEGIN_ARRAY -> {
-                                            reader.beginArray()
+                                            beginArray()
 
-                                            while (reader.hasNext()) {
-                                                val token = reader.peek()
-                                                if (token != JsonToken.STRING)
-                                                    throw InvalidMetadataException("loader access wideners only accepts strings!")
-                                                dependencyUnless.add(reader.nextString())
+                                            forEachItemArray {
+                                                dependencyUnless.add(readString())
+                                                false
                                             }
 
-                                            reader.endArray()
+                                            endArray()
                                         }
                                         else -> throw InvalidMetadataException("loader dependency (ID: $dependencyId) unless should either be a string or an array!")
                                     }
                                 }
                                 "only" -> {
                                     when (token) {
-                                        JsonToken.STRING -> dependencyOnly.add(reader.nextString())
+                                        JsonToken.STRING -> dependencyOnly.add(readString())
                                         JsonToken.BEGIN_ARRAY -> {
-                                            reader.beginArray()
+                                            beginArray()
 
-                                            while (reader.hasNext()) {
-                                                val token = reader.peek()
-                                                if (token != JsonToken.STRING)
-                                                    throw InvalidMetadataException("loader access wideners only accepts strings!")
-                                                dependencyOnly.add(reader.nextString())
+                                            forEachItemArray {
+                                                dependencyOnly.add(readString())
+                                                false
                                             }
 
-                                            reader.endArray()
+                                            endArray()
                                         }
                                         else -> throw InvalidMetadataException("loader dependency (ID: $dependencyId) only should either be a string or an array!")
                                     }
                                 }
                             }
+
+                            false
                         }
 
-                        reader.endObject()
+                        endObject()
 
                         if (dependencyVersion == null)
-                            throw InvalidMetadataException("dependency version appears to be invalid! ($dependencyId)")
+                            throw InvalidMetadataException("Dependency version appears to be invalid! ($dependencyId)")
+                        dependencies.add(Dependency(dependencyId, dependencyVersion!!, dependencyUnless, dependencyOnly))
 
-                        dependencies.add(Dependency(dependencyId, dependencyVersion, dependencyUnless, dependencyOnly))
+                        false
                     }
 
-                    reader.endArray()
+                    endArray()
                 }
-                else -> reader.skipValue()
+                else -> return@forEachItemObject true
             }
+
+            false
         }
 
-        reader.endObject()
+        endObject()
 
-        return LoaderData(environment, accessWideners, entrypoints, dependencies)
+        return LoaderData(environment, entrypoints, dependencies)
     }
 
-    private fun readAdditional(value: JsonObject, reader: JsonReader, token: JsonToken) {
-        if (token != JsonToken.BEGIN_OBJECT)
-            throw InvalidMetadataException("additional values should be a string!")
+    private fun JsonReader.readAdditional(value: JsonObject) {
+        requireObject("Mod additional values")
 
-        reader.beginObject()
-
-        var currentName = ""
-        while (reader.hasNext()) {
-            val token = reader.peek()
-            if (token == JsonToken.NAME) {
-                currentName = reader.nextName()
-                continue
-            }
-
+        forEachItemObject { token, name ->
             when (token) {
-                JsonToken.STRING -> value.addProperty(currentName, reader.nextString())
-                JsonToken.BOOLEAN -> value.addProperty(currentName, reader.nextBoolean())
-                JsonToken.NULL -> value.add(currentName, JsonNull.INSTANCE)
+                JsonToken.STRING -> value.addProperty(name, readString())
+                JsonToken.BOOLEAN -> value.addProperty(name, readString())
+                JsonToken.NULL -> value.add(name, JsonNull.INSTANCE)
                 JsonToken.NUMBER -> {
-                    val str = reader.nextString()
+                    val str = readString()
                     if (str.contains(".")) {
                         val double = str.toDoubleOrNull()
                         if (double == null) {
-                            value.addProperty(currentName, str.toLong())
-                        } else value.addProperty(currentName, double)
-                    } else value.addProperty(currentName, str.toInt())
+                            value.addProperty(name, str.toLong())
+                        } else value.addProperty(name, double)
+                    } else value.addProperty(name, str.toInt())
                 }
 
-                else -> reader.skipValue()
+                else -> return@forEachItemObject true
             }
+
+            false
         }
 
-        reader.endObject()
+        endObject()
     }
 
 }

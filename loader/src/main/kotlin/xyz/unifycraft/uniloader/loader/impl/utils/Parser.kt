@@ -85,7 +85,7 @@ class JsonItemIterator(
     }
 }
 
-fun JsonReader.forEachItemObject(block: JsonItemIterator.(token: JsonToken, name: String) -> Unit) {
+fun JsonReader.forEachItemObject(block: JsonItemIterator.(token: JsonToken, name: String) -> Boolean) {
     val iterator = JsonItemIterator(this)
     var currentName = ""
     while (hasNext()) {
@@ -96,18 +96,20 @@ fun JsonReader.forEachItemObject(block: JsonItemIterator.(token: JsonToken, name
         }
 
         iterator.token = token
-        iterator.block(token, currentName)
+        val skip = iterator.block(token, currentName)
+        if (skip) skipValue()
     }
 
     iterator.token = JsonToken.END_DOCUMENT
 }
 
-fun JsonReader.forEachItemArray(block: JsonItemIterator.(token: JsonToken) -> Unit) {
+fun JsonReader.forEachItemArray(block: JsonItemIterator.(token: JsonToken) -> Boolean) {
     val iterator = JsonItemIterator(this)
     while (hasNext()) {
         val token = peek()
         iterator.token = token
-        iterator.block(token)
+        val skip = iterator.block(token)
+        if (skip) skipValue()
     }
 
     iterator.token = JsonToken.END_DOCUMENT
