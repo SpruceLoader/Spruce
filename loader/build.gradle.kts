@@ -17,11 +17,8 @@ dependencies {
     implementation("org.ow2.asm:asm-tree:9.3")
     implementation("xyz.unifycraft:ULASM:1.0.0-beta.12")
 
-    val log4j = "2.18.0"
-    implementation("org.apache.logging.log4j:log4j-api:$log4j")
-    implementation("org.apache.logging.log4j:log4j-core:$log4j")
-    implementation("org.apache.logging.log4j:log4j-slf4j-impl:$log4j")
-    implementation("org.apache.logging.log4j:log4j-slf4j18-impl:$log4j")
+    compileOnly("org.apache.logging.log4j:log4j-api:2.8.1")
+    compileOnly("org.slf4j:slf4j-api:1.8.0-beta4")
 }
 
 publishing {

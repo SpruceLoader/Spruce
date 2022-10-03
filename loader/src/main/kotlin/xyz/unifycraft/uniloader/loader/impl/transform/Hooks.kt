@@ -1,13 +1,13 @@
 package xyz.unifycraft.uniloader.loader.impl.transform
 
-import org.apache.logging.log4j.LogManager
+import org.slf4j.LoggerFactory
 import xyz.unifycraft.uniloader.api.ClientModEntrypoint
 import xyz.unifycraft.uniloader.api.ServerModEntrypoint
 import xyz.unifycraft.uniloader.loader.api.UniLoader
 
 @Suppress("unused")
 object Hooks {
-    private val logger = LogManager.getLogger("UniLoader Hooks")
+    private val logger = LoggerFactory.getLogger("${UniLoader.NAME} Hooks")
     val internalName = Hooks::class.java.name.replace('.', '/')
 
     @JvmStatic

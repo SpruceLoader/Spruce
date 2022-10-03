@@ -1,6 +1,6 @@
 package xyz.unifycraft.uniloader.loader.impl.discoverer
 
-import org.apache.logging.log4j.LogManager
+import org.slf4j.LoggerFactory
 import xyz.unifycraft.launchwrapper.Launch
 import xyz.unifycraft.uniloader.loader.api.UniLoader
 import xyz.unifycraft.uniloader.loader.exceptions.ModDiscoveryException
@@ -15,7 +15,7 @@ import java.util.jar.JarFile
 
 class ModDiscoverer {
     companion object {
-        private val logger = LogManager.getLogger("Mod Discoverer")
+        private val logger = LoggerFactory.getLogger("Mod Discoverer")
     }
 
     private val finders = mutableListOf<ModFinder>()

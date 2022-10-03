@@ -1,6 +1,6 @@
 package xyz.unifycraft.uniloader.loader.impl.discoverer.finders
 
-import org.apache.logging.log4j.LogManager
+import org.slf4j.LoggerFactory
 import xyz.unifycraft.launchwrapper.Launch
 import xyz.unifycraft.uniloader.loader.impl.metadata.ModMetadata
 import java.io.File
@@ -10,7 +10,7 @@ import java.nio.file.Paths
 
 class ClasspathModFinder : ModFinder {
     companion object {
-        private val logger = LogManager.getLogger("Classpath Mod Finder")
+        private val logger = LoggerFactory.getLogger("Classpath Mod Finder")
     }
 
     override fun find(): List<File> {

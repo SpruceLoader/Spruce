@@ -1,3 +1,7 @@
+plugins {
+    id("xyz.unifycraft.uniloom") version("1.0.0-beta.21") apply(false)
+}
+
 allprojects {
     group = extra["project.group"]?.toString()
         ?: throw groovy.lang.MissingPropertyException("Project group was not set!")

@@ -1,6 +1,6 @@
 package xyz.unifycraft.uniloader.loader.impl
 
-import org.apache.logging.log4j.LogManager
+import org.slf4j.LoggerFactory
 import xyz.unifycraft.launchwrapper.Launch
 import xyz.unifycraft.launchwrapper.api.ArgumentMap
 import xyz.unifycraft.uniloader.api.Entrypoint
@@ -23,7 +23,7 @@ import java.lang.IllegalArgumentException
 
 class UniLoaderImpl : UniLoader {
     companion object {
-        private val logger = LogManager.getLogger(UniLoader.NAME)
+        private val logger = LoggerFactory.getLogger(UniLoader.NAME)
     }
 
     private lateinit var currentEnvironment: Environment
