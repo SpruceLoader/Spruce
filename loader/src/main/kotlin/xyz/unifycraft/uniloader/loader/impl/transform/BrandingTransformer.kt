@@ -1,6 +1,6 @@
 package xyz.unifycraft.uniloader.loader.impl.transform
 
-import org.objectweb.asm.Opcodes
+/*import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.ClassNode
 import xyz.unifycraft.uniloader.ulasm.transformers.BaseTransformer
 import xyz.unifycraft.uniloader.ulasm.utils.InsnHelper
@@ -34,3 +34,4 @@ object BrandingTransformer : BaseTransformer {
         return modified
     }
 }
+*/

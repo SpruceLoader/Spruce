@@ -1,6 +1,7 @@
 package xyz.unifycraft.uniloader.loader.impl
 
 import org.apache.logging.log4j.LogManager
+import xyz.unifycraft.bytetransform.ByteTransform
 import xyz.unifycraft.launchwrapper.Launch
 import xyz.unifycraft.launchwrapper.api.ArgumentMap
 import xyz.unifycraft.uniloader.api.Entrypoint
@@ -67,8 +68,7 @@ class UniLoaderImpl : UniLoader {
         val mods = allMods
         for (mod in mods) {
             println("Mod ${mod.name} with ID ${mod.id} and version ${mod.version.readableString} was loaded successfully!")
-            val dependencies = mod.loader?.dependencies ?: continue
-            dependencies.forEach { dependency ->
+            mod.loader?.dependencies?.forEach { dependency ->
                 if (mods.any {
                     dependency.unless.contains(it.id)
                 }) return@forEach
@@ -79,8 +79,13 @@ class UniLoaderImpl : UniLoader {
                     it.id.equals(dependency.id, true) && it.version <= dependency.version
                 }) throw MissingDependencyException("${mod.name} requires a mod with the ID ${dependency.id}, but that mod isn't present!")
             }
-            println("${mod.name} dependencies: $dependencies")
+
+            mod.loader?.byteTransformConfigs?.forEach { config ->
+                ByteTransform.addConfigFile(config, Launch.getInstance().classLoader)
+            }
         }
+
+        ByteTransform.initialize()
 
         for (entrypoint in getEntrypoints<PreLaunchEntrypoint>("preLaunch")) {
             entrypoint.initialize(argMap)

@@ -50,6 +50,7 @@ class BuiltinModMetadata {
         loader = LoaderData(
             environment = Environment.BOTH,
             entrypoints = emptyMap(),
+            byteTransformConfigs = emptyList(),
             dependencies = emptyList()
         ),
 

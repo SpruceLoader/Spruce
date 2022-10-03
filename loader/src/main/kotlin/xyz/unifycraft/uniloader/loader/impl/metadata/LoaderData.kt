@@ -5,13 +5,12 @@ import xyz.unifycraft.uniloader.loader.api.Environment
 data class LoaderData(
     val environment: Environment,
     val entrypoints: Map<String, EntrypointMetadata>,
+    val byteTransformConfigs: List<String>,
     val dependencies: List<Dependency>
 ) {
     companion object {
-
         @JvmStatic
         fun empty() =
-            LoaderData(Environment.BOTH, emptyMap(), emptyList())
-
+            LoaderData(Environment.BOTH, emptyMap(), emptyList(), emptyList())
     }
 }

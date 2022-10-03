@@ -1,6 +1,6 @@
 package xyz.unifycraft.uniloader.loader.impl.transform
 
-import org.objectweb.asm.Opcodes
+/*import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.TypeInsnNode
 import xyz.unifycraft.uniloader.ulasm.insnList
@@ -35,3 +35,4 @@ object ServerEntrypointTransformer : BaseTransformer {
         return modified
     }
 }
+*/

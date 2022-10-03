@@ -180,6 +180,7 @@ object ModMetadataParser : Parser<ModMetadata> {
 
         var environment = Environment.BOTH
         val entrypoints = mutableMapOf<String, EntrypointMetadata>()
+        val byteTransformConfigs = mutableListOf<String>()
         val dependencies = mutableListOf<Dependency>()
 
         forEachItemObject { token, name ->
@@ -217,6 +218,22 @@ object ModMetadataParser : Parser<ModMetadata> {
                     }
 
                     endArray()
+                }
+                "bytetransform" -> {
+                    when (token) {
+                        JsonToken.STRING -> byteTransformConfigs.add(readString())
+                        JsonToken.BEGIN_ARRAY -> {
+                            beginArray()
+
+                            forEachItemArray {
+                                byteTransformConfigs.add(readString())
+                                false
+                            }
+
+                            endArray()
+                        }
+                        else -> throw InvalidMetadataException("ByteTransform config value can only be a string or an array!")
+                    }
                 }
                 "dependencies" -> {
                     requireArray("Mod dependencies")
@@ -289,7 +306,7 @@ object ModMetadataParser : Parser<ModMetadata> {
 
         endObject()
 
-        return LoaderData(environment, entrypoints, dependencies)
+        return LoaderData(environment, entrypoints, byteTransformConfigs, dependencies)
     }
 
     private fun JsonReader.readAdditional(value: JsonObject) {

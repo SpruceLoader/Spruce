@@ -1,17 +1,12 @@
 package xyz.unifycraft.uniloader.loader.impl.transform
 
-import org.objectweb.asm.tree.ClassNode
+/*import org.objectweb.asm.tree.ClassNode
 import xyz.unifycraft.uniloader.api.TransformerEntrypoint
 import xyz.unifycraft.uniloader.loader.api.UniLoader
 import xyz.unifycraft.uniloader.ulasm.transformers.BaseTransformer
 import xyz.unifycraft.uniloader.ulasm.transformers.InitialReadResult
 
 object TransformerEntrypointTransformer : BaseTransformer {
-    private val isLoaded: Boolean
-        get() = UniLoader.getInstance().isLoadingComplete
-    private val entrypoints: List<TransformerEntrypoint>
-        get() = UniLoader.getInstance().getEntrypoints("transformer")
-
     override fun getTarget() = "*"
 
     override fun beforeRead(bytes: ByteArray): InitialReadResult {
@@ -44,3 +39,4 @@ object TransformerEntrypointTransformer : BaseTransformer {
         return modified
     }
 }
+*/

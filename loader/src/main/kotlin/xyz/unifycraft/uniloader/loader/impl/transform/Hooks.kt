@@ -17,7 +17,7 @@ object Hooks {
             return UniLoader.NAME
         }
 
-        return if (BrandingTransformer.VANILLA == original) UniLoader.NAME else "$original,${UniLoader.NAME}"
+        return ""//if (BrandingTransformer.VANILLA == original) UniLoader.NAME else "$original,${UniLoader.NAME}"
     }
 
     @JvmStatic

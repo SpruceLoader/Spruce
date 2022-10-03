@@ -1,12 +1,7 @@
 plugins {
-    java
+    `java-library`
     kotlin("jvm")
     `maven-publish`
-}
-
-repositories {
-    mavenCentral()
-    maven("https://libraries.minecraft.net/")
 }
 
 dependencies {
@@ -15,13 +10,16 @@ dependencies {
 
     implementation("xyz.unifycraft:UniLaunchwrapper:1.0.2")
     implementation("org.ow2.asm:asm-tree:9.3")
-    implementation("xyz.unifycraft:ULASM:1.0.0-beta.12")
+    implementation("xyz.unifycraft:ByteTransform:1.0.0-alpha.12")
 
-    val log4j = "2.18.0"
+    val slf4j = "2.0.0"
+    implementation("org.slf4j:slf4j-api:$slf4j")
+    implementation("org.slf4j:slf4j-ext:$slf4j")
+
+    val log4j = "2.19.0"
     implementation("org.apache.logging.log4j:log4j-api:$log4j")
     implementation("org.apache.logging.log4j:log4j-core:$log4j")
-    implementation("org.apache.logging.log4j:log4j-slf4j-impl:$log4j")
-    implementation("org.apache.logging.log4j:log4j-slf4j18-impl:$log4j")
+    implementation("org.apache.logging.log4j:log4j-slf4j2-impl:$log4j")
 }
 
 publishing {
