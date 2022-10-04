@@ -82,7 +82,7 @@ class ModDiscoverer {
 
             links {
                 home = "https://minecraft.net"
-                discord = "https://discord.gg/minecract"
+                discord = "https://discord.gg/minecraft"
             }
         })
 
@@ -93,6 +93,16 @@ class ModDiscoverer {
 
             links {
                 home = "https://java.com"
+            }
+        })
+
+        mods.add(builtinMod {
+            name = "Kotlin"
+            version = KotlinVersion.CURRENT.toString()
+            id = "kotlin"
+
+            links {
+                // TODO
             }
         })
     }

@@ -2,6 +2,7 @@ package xyz.unifycraft.uniloader.loader.impl.entrypoints
 
 import xyz.unifycraft.launchwrapper.Launch
 import xyz.unifycraft.uniloader.api.Entrypoint
+import xyz.unifycraft.uniloader.loader.api.UniLoader
 import xyz.unifycraft.uniloader.loader.impl.discoverer.ModDiscoverer
 import xyz.unifycraft.uniloader.loader.impl.metadata.EntrypointMetadata
 
@@ -10,6 +11,9 @@ object EntrypointHandler {
     private val metadata = mutableMapOf<String, EntrypointMetadata>()
     private val adapterCache = mutableMapOf<String, EntrypointAdapter>()
     private val cache = mutableMapOf<String, MutableList<Entrypoint>>()
+
+    private val classLoader: ClassLoader
+        get() = Launch.getInstance().classLoader
 
     fun initialize(discoverer: ModDiscoverer) {
         discoverer.getMods().forEach { mod ->
@@ -30,11 +34,11 @@ object EntrypointHandler {
                         throw IllegalArgumentException("The class provided as an adapter is not valid! (${metadata.adapter})")
                     clz.getConstructor().newInstance() as EntrypointAdapter
                 }
-                val clz = Launch.getInstance().classLoader.loadClass(metadata.value)
+                val clz = classLoader.loadClass(metadata.value)
                 if (!clz.superclass.isAssignableFrom(Entrypoint::class.java))
                     throw IllegalArgumentException("The class provided as an entrypoint is not valid! (${metadata.value})")
                 adapter.create(metadata.value, clz as Class<Entrypoint>)
-            } else Launch.getInstance().classLoader.loadClass(metadata.value).getConstructor().newInstance() as Entrypoint
+            } else classLoader.loadClass(metadata.value).getConstructor().newInstance() as Entrypoint
             val entrypoints = cache.computeIfAbsent(key) { mutableListOf() }
             entrypoints.add(obj)
             cache[key] = entrypoints

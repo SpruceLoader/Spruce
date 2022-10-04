@@ -3,6 +3,7 @@ package xyz.unifycraft.uniloader.loader.impl
 import org.slf4j.LoggerFactory
 import xyz.unifycraft.launchwrapper.Launch
 import xyz.unifycraft.launchwrapper.api.ArgumentMap
+import xyz.unifycraft.launchwrapper.api.EnvSide
 import xyz.unifycraft.uniloader.api.Entrypoint
 import xyz.unifycraft.uniloader.api.PreLaunchEntrypoint
 import xyz.unifycraft.uniloader.loader.api.Environment
@@ -26,18 +27,13 @@ class UniLoaderImpl : UniLoader {
         private val logger = LoggerFactory.getLogger(UniLoader.NAME)
     }
 
-    private lateinit var currentEnvironment: Environment
+    override lateinit var environment: Environment
     override lateinit var gameVersion: MinecraftVersion
+
     private val discoverer = ModDiscoverer()
 
-    override var environment: Environment
-        get() = currentEnvironment
-        set(value) {
-            currentEnvironment = value
-        }
-
     override val gameDir = File(".")
-    override val loaderDir = File(gameDir, "UniLoader")
+    override val loaderDir = File(gameDir, UniLoader.NAME)
     override val configDir = File(loaderDir, "config")
     override val dataDir = File(loaderDir, "data")
     override val modsDir = File(loaderDir, "mods")
@@ -45,11 +41,19 @@ class UniLoaderImpl : UniLoader {
     override lateinit var loaderConfig: LoaderConfig
     override var isLoadingComplete = false
 
-    override fun load(argMap: ArgumentMap) {
-        if (currentEnvironment == Environment.BOTH) {
+    override fun load(argMap: ArgumentMap, env: EnvSide) {
+        environment = Environment.valueOf(env.name)
+        if (environment == Environment.BOTH) {
             logger.error("How... How did you manage to do this..? (current environment is \"BOTH\")")
-            throw IllegalStateException("Weird environment... $currentEnvironment")
+            throw IllegalStateException("Weird environment... $environment")
         }
+
+        if (!loaderDir.exists() && !loaderDir.mkdirs())
+            throw IllegalStateException("Could not create ${UniLoader.NAME} directory!")
+        if (!configDir.exists() && !configDir.mkdirs())
+            throw IllegalStateException("Could not create config directory!")
+        if (!dataDir.exists() && !dataDir.mkdirs())
+            throw IllegalStateException("Could not create data directory!")
 
         loaderConfig = LoaderConfigParser.parse(File(loaderDir, "config.json").apply {
             if (!exists()) {

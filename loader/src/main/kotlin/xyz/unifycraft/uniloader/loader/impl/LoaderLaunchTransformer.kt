@@ -4,7 +4,6 @@ import xyz.unifycraft.launchwrapper.Launch
 import xyz.unifycraft.launchwrapper.api.ArgumentMap
 import xyz.unifycraft.launchwrapper.api.EnvSide
 import xyz.unifycraft.launchwrapper.api.LaunchTransformer
-import xyz.unifycraft.uniloader.loader.api.Environment
 import xyz.unifycraft.uniloader.loader.api.UniLoader
 import xyz.unifycraft.uniloader.loader.impl.transform.*
 import xyz.unifycraft.uniloader.ulasm.ULASM
@@ -32,8 +31,7 @@ class LoaderLaunchTransformer : LaunchTransformer {
         Launch.getInstance().classLoader.addClassLoaderException("xyz.unifycraft.uniloader.")
 
         val loader = UniLoader.getInstance()
-        loader.environment = Environment.valueOf(env.name)
-        loader.load(argMap)
+        loader.load(argMap, env)
     }
 
     override fun transform(className: String, rawClass: ByteArray): ByteArray {

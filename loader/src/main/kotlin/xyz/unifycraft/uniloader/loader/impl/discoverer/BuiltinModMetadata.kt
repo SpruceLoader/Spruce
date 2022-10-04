@@ -5,11 +5,11 @@ import xyz.unifycraft.uniloader.loader.api.Environment
 import xyz.unifycraft.uniloader.loader.impl.metadata.*
 import xyz.unifycraft.uniloader.loader.impl.metadata.parser.VersionParser
 
-fun builtinMod(block: BuiltinModMetadata.() -> Unit) = BuiltinModMetadata()
+internal fun builtinMod(block: BuiltinModMetadata.() -> Unit) = BuiltinModMetadata()
     .apply(block)
     .build()
 
-class BuiltinModMetadata {
+internal class BuiltinModMetadata {
     lateinit var name: String
     lateinit var version: String
     lateinit var id: String

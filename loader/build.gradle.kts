@@ -4,16 +4,11 @@ plugins {
     `maven-publish`
 }
 
-repositories {
-    mavenCentral()
-    maven("https://libraries.minecraft.net/")
-}
-
 dependencies {
     implementation(kotlin("stdlib"))
     implementation("com.google.code.gson:gson:2.9.0")
 
-    implementation("xyz.unifycraft:UniLaunchwrapper:1.0.2")
+    implementation("xyz.unifycraft:UniLaunchwrapper:1.1.0")
     implementation("org.ow2.asm:asm-tree:9.3")
     implementation("xyz.unifycraft:ULASM:1.0.0-beta.12")
 
