@@ -1,6 +1,6 @@
 package xyz.deftu.testmod;
 
-import xyz.unifycraft.uniloader.api.ClientModEntrypoint;
+import xyz.spruceloader.api.ClientModEntrypoint;
 
 public class TestModClient implements ClientModEntrypoint {
     public void initialize() {

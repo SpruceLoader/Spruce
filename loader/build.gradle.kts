@@ -8,9 +8,9 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation("com.google.code.gson:gson:2.9.0")
 
-    implementation("xyz.unifycraft:UniLaunchwrapper:1.1.0")
+    implementation("xyz.spruceloader:SpruceLaunchwrapper:1.2.2")
     implementation("org.ow2.asm:asm-tree:9.3")
-    implementation("xyz.unifycraft:ULASM:1.0.0-beta.12")
+    implementation("xyz.spruceloader:sponge-mixin:1.0.0-beta.3+mixin.0.8.5-local")
 
     compileOnly("org.apache.logging.log4j:log4j-api:2.8.1")
     compileOnly("org.slf4j:slf4j-api:1.8.0-beta4")

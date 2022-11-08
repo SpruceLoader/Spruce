@@ -7,7 +7,7 @@ pluginManagement {
         mavenCentral()
 
         // Repositories
-        maven("https://maven.unifycraft.xyz/releases")
+        maven("https://maven.enhancedpixel.xyz/releases")
         maven("https://maven.fabricmc.net")
         maven("https://maven.architectury.dev/")
         maven("https://maven.minecraftforge.net")
@@ -16,7 +16,7 @@ pluginManagement {
         maven("https://jitpack.io/")
 
         // Snapshots
-        maven("https://maven.unifycraft.xyz/snapshots")
+        maven("https://maven.enhancedpixel.xyz/snapshots")
         maven("https://s01.oss.sonatype.org/content/groups/public/")
         mavenLocal()
     }

@@ -3,10 +3,8 @@ plugins {
 }
 
 allprojects {
-    group = extra["project.group"]?.toString()
-        ?: throw groovy.lang.MissingPropertyException("Project group was not set!")
-    version = extra["project.version"]?.toString()
-        ?: throw groovy.lang.MissingPropertyException("Project version was not set!")
+    group = extra["project.group"]?.toString() ?: throw groovy.lang.MissingPropertyException("Project group was not set!")
+    version = extra["project.version"]?.toString() ?: throw groovy.lang.MissingPropertyException("Project version was not set!")
 
     repositories {
         // Snapshots
@@ -19,7 +17,9 @@ allprojects {
         maven("https://libraries.minecraft.net/")
         maven("https://repo.spongepowered.org/maven/")
         maven("https://jitpack.io/")
-        maven("https://maven.unifycraft.xyz/releases")
-        maven("https://maven.unifycraft.xyz/snapshots")
+        maven("https://maven.spruceloader.xyz/releases")
+        maven("https://maven.spruceloader.xyz/snapshots")
+        maven("https://maven.enhancedpixel.xyz/releases")
+        maven("https://maven.enhancedpixel.xyz/snapshots")
     }
 }
