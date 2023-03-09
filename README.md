@@ -13,7 +13,7 @@ reinvents the wheel to do so. The entire project is written from
 scratch, aside from borrowing a few small components from existant
 loaders. 
 
-We take the best aspects of both Fabric and Forge and combine
+We take the best aspects of both Fabric and Quilt and combine
 them into one beautifully executed mod loader which fits all
 your needs, whether you're a user or a developer. This means we
 also include a massive built-in API (no additional mods for this!)
