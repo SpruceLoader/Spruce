@@ -42,4 +42,4 @@ IntelliJ IDEA run configurations.
 </div>
 
 [lgpl3]: https://www.gnu.org/licenses/lgpl-3.0.en.html
-[discord]: https://discord.gg/s74gCcUvhM
+[discord]: https://discord.gg/NqGbaffRZG
