@@ -14,7 +14,6 @@ classes
 *.iws
 *.iml
 /.idea/*
-!/.idea/gradle.xml
 
 # netbeans
 .nb-gradle
@@ -22,6 +21,9 @@ classes
 
 # vs code
 .vscode
+
+# fleet
+.fleet
 
 # gradle
 build
