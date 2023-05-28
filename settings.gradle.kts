@@ -21,5 +21,5 @@ val projectName: String = extra["project.name"]?.toString()
     ?: throw MissingPropertyException("Project name was not set!")
 rootProject.name = projectName
 
-include("launch")
+include("trunk")
 include("loader")

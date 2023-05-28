@@ -1,3 +1,3 @@
 dependencies {
-    implementation(project(":launch"))
+    implementation(project(":trunk"))
 }
