@@ -18,11 +18,10 @@
 
 package xyz.spruceloader.trunk.entrypoint.classpath;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import xyz.spruceloader.trunk.Trunk;
 import xyz.spruceloader.trunk.api.transform.ITransformationService;
-
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 
 /**
  * Trunk entrypoint based on jar classpath.
@@ -30,6 +29,8 @@ import java.lang.invoke.MethodType;
  * @since 0.0.1
  */
 public final class TrunkMain {
+    private static final Logger LOGGER = LogManager.getLogger();
+
     public static void main(String[] args) {
         try {
             ITransformationService transformationService =
@@ -37,20 +38,7 @@ public final class TrunkMain {
             TransformingClassLoader classLoader =
                     new TransformingClassLoader(transformationService);
             Thread.currentThread().setContextClassLoader(classLoader);
-
-            Class<?> trunkClass =
-                    classLoader.loadClass("xyz.spruceloader.trunk.Trunk");
-            MethodHandle launchMethod = MethodHandles.publicLookup()
-                    .findConstructor(trunkClass, MethodType.methodType(
-                            void.class, ITransformationService.class
-                    ));
-            Object trunkInstance = launchMethod.invokeExact(transformationService);
-
-            MethodHandle runMethod = MethodHandles.publicLookup()
-                    .findVirtual(trunkClass, "run", MethodType.methodType(
-                            void.class, String[].class
-                    ));
-            runMethod.invokeExact(trunkInstance, args);
+            new Trunk(transformationService).run(args);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }

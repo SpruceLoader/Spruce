@@ -18,7 +18,10 @@
 
 package xyz.spruceloader.trunk.api.transform;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Predicate;
 
 /**
  * @since 0.0.1
@@ -28,17 +31,29 @@ public interface ITransformer {
     /**
      * Performs byte transformations on a given class buffer.
      *
-     * @param fqcn            The fully qualified class name of the resource being transformed
-     *                        (e.g. "java/lang/String", "com/example/Class$Inner").
-     * @param classfileBuffer The raw bytes of the class being transformed.
+     * @param context   The immutable transformation context, containing extra
+     *                  information about the transformation; unchanged for a
+     *                  singular transformation.
+     * @param classData The classfile byte buffer, may be {@code null}.
+     *                  If {@code null}, the transformer may attempt to load the
+     *                  class data itself or try to get the resources via
+     *                  {@link ITransformationContext#getClassLoader()} and
+     *                  {@link ClassLoader#getResource(String)}.
      * @return The transformed bytes, or {@code null} if no transformations were performed.
      */
-    byte @Nullable [] transform(String fqcn, byte[] classfileBuffer);
+    byte @Nullable [] transform(@NotNull ITransformationContext context, byte @Nullable [] classData);
 
     /**
      * @return The priority of this transformer; higher priority transformers are run first.
      */
-    default int priority() {
+    default int getPriority() {
         return 0;
+    }
+
+    /**
+     * @return A filter for which classes this transformer should be applied to.
+     */
+    default Predicate<String> getTransformationFilter() {
+        return s -> true;
     }
 }

@@ -16,24 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.spruceloader.loader.api.mod.metadata;
+package xyz.spruceloader.loader.api.env;
 
-import org.jetbrains.annotations.Unmodifiable;
-
-import java.util.Collections;
-import java.util.Map;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
 
 /**
- * @since 0.0.1
+ * Marks a class as a target for environment-specific code.
+ *
  */
-public interface ModPerson {
-    String getId();
-
-    default String getDisplayName() {
-        return getId();
-    }
-
-    default @Unmodifiable Map<String, Object> getOther() {
-        return Collections.emptyMap();
-    }
+@Target({ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.FIELD})
+public @interface EnvTarget {
 }

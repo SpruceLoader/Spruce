@@ -16,13 +16,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.spruceloader.loader.api.env;
+package xyz.spruceloader.loader.launch;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import xyz.spruceloader.trunk.api.ILauncherService;
 
 /**
  * @since 0.0.1
  */
-public enum Environment {
-    CLIENT,
-    SERVER,
-    BOTH
+public class SpruceLauncherService implements ILauncherService {
+    @Override
+    public @Nullable LauncherRunnable launchTarget(@NotNull ClassLoader classLoader, @NotNull String @NotNull [] args) {
+        return () -> {
+            throw new UnsupportedOperationException("Unimplemented");
+        };
+    }
 }

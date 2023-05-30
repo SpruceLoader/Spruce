@@ -19,7 +19,10 @@
 package xyz.spruceloader.trunk.api;
 
 import org.jetbrains.annotations.NotNull;
-import xyz.spruceloader.trunk.Trunk;
+import xyz.spruceloader.trunk.api.transform.ITransformationService;
+
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * @since 0.0.1
@@ -28,7 +31,17 @@ public interface ITrunkService {
     /**
      * Initialize the Trunk Service.
      *
-     * @param trunk The {@link Trunk} instance.
+     * @param blackboard            Trunk's shared {@link IBlackboard Blackboard}.
+     * @param transformationService Trunk's current {@link ITransformationService TransformationService}.
      */
-    void initialize(@NotNull Trunk trunk);
+    void initialize(@NotNull IBlackboard blackboard, @NotNull ITransformationService transformationService);
+
+    /**
+     * Discover other Trunk Services to be loaded during the next pass.
+     *
+     * @return A set of Trunk Services.
+     */
+    default Set<ITrunkService> discoverServices() {
+        return Collections.emptySet();
+    }
 }

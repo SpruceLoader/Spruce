@@ -16,21 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.spruceloader.trunk.api;
+package xyz.spruceloader.loader.api.mod.loader;
 
-/**
- * @since 0.0.1
- */
-public interface ILauncherService {
-    /**
-     * Get the launch target.
-     *
-     * @return The launch target.
-     */
-    LauncherRunnable launchTarget(ClassLoader classLoader, String[] args);
-
-    @FunctionalInterface
-    interface LauncherRunnable {
-        void launch() throws Throwable;
-    }
+public interface ModLoader {
 }

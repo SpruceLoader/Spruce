@@ -33,7 +33,7 @@ public final class Trunk {
 //    private final TrunkClassLoader trunkClassLoader;
     private final ITransformationService transformationService;
 
-    public Trunk(ITransformationService transformationService/*, TrunkClassLoader classLoader*/) {
+    public Trunk(@NotNull ITransformationService transformationService/*, TrunkClassLoader classLoader*/) {
         if (instance != null) {
             throw new UnsupportedOperationException("Trunk has already been initialized!");
         }
@@ -41,10 +41,15 @@ public final class Trunk {
 //        this.trunkClassLoader = classLoader;
 
         instance = this;
+
+        String caller = new Throwable().getStackTrace()[1].getClassName();
+        logger.trace(LogMarkers.ENTRYPOINT, "Initializing Trunk from entrypoint \"{}\"", caller);
     }
 
-    private void run(String[] args) {
-        logger.info("Trunk has been initialized!");
+    public void run(String[] args) {
+        System.setProperty("log4j2.formatMsgNoLookups", "true");
+
+        logger.info("Initialized Trunk successfully, delegating launch...");
     }
 
     public static @NotNull Trunk getInstance() {

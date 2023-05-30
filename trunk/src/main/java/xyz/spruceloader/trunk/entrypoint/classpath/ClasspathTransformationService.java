@@ -18,15 +18,74 @@
 
 package xyz.spruceloader.trunk.entrypoint.classpath;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import xyz.spruceloader.trunk.LogMarkers;
+import xyz.spruceloader.trunk.api.transform.ITransformationContext;
 import xyz.spruceloader.trunk.api.transform.ITransformationService;
 import xyz.spruceloader.trunk.api.transform.ITransformer;
 
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 /**
  * A transformation service for classpath based entrypoints.
+ *
+ * @since 0.0.1
  */
 final class ClasspathTransformationService implements ITransformationService {
-    @Override
-    public void registerTransformer(ITransformer transformer, Capability... transformerCapability) {
+    private static final Logger LOGGER = LogManager.getLogger();
+    private final Map<ITransformer, Set<ITransformationContext.Capability>> transformers = new HashMap<>();
 
+    @Override
+    public void registerTransformer(@NotNull ITransformer transformer, @NotNull ITransformationContext.Capability @NotNull ... transformerCapabilities) {
+        this.transformers.put(transformer, Arrays.stream(transformerCapabilities).collect(Collectors.toSet()));
+    }
+
+    @Override
+    public void unregisterTransformer(@NotNull ITransformer transformer) {
+        this.transformers.remove(transformer);
+    }
+
+    @Override
+    public byte @Nullable [] applyChanges(@NotNull ITransformationContext context, byte @Nullable [] classData) {
+        List<ITransformer> candidates = new ArrayList<>(transformers.size());
+        Predicate<Set<ITransformationContext.Capability>> validator = context.getCapabilitiesValidator();
+        String fqcn = context.getClassName();
+
+        for (Map.Entry<ITransformer, Set<ITransformationContext.Capability>> entry : transformers.entrySet()) {
+            if (validator.test(entry.getValue())) {
+                ITransformer transformer = entry.getKey();
+                if (transformer.getTransformationFilter().test(fqcn)) {
+                    candidates.add(transformer);
+                }
+            }
+        }
+
+        if (candidates.isEmpty()) {
+            return null;
+        }
+        candidates.sort(Comparator.comparingInt(ITransformer::getPriority));
+
+        boolean transformed = false;
+        byte[] transformedData = classData;
+        for (ITransformer transformer : candidates) {
+            long start = System.currentTimeMillis();
+            LOGGER.trace(LogMarkers.TRANSFORM, "Applying transformer {} to {}", transformer.getClass().getName(), fqcn);
+            byte[] processedBuffer = transformer.transform(context, classData);
+            LOGGER.trace(LogMarkers.TRANSFORM, "Tramsformation took {}ms", System.currentTimeMillis() - start);
+            if (processedBuffer != null) {
+                transformed = true;
+                transformedData = processedBuffer;
+            }
+        }
+
+        if (!transformed) {
+            return null;
+        }
+        return transformedData;
     }
 }

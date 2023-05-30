@@ -16,7 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.spruceloader.loader.api.mod.loader;
+package xyz.spruceloader.trunk.api;
 
-public interface ModLoadingHandler {
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * @since 0.0.1
+ */
+@FunctionalInterface
+public interface IMappingProvider {
+    @NotNull String mapType(@NotNull String type);
 }

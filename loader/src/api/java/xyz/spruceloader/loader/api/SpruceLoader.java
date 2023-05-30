@@ -16,18 +16,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.spruceloader.loader.impl.launch;
+package xyz.spruceloader.loader.api;
 
-import org.jetbrains.annotations.NotNull;
-import xyz.spruceloader.trunk.Trunk;
-import xyz.spruceloader.trunk.api.ITrunkService;
+import java.util.ServiceLoader;
 
 /**
  * @since 0.0.1
  */
-public class SpruceTrunkService implements ITrunkService {
-    @Override
-    public void initialize(@NotNull Trunk trunk) {
-//        SpruceLoaderImpl.getInstance().initialize();
+public interface SpruceLoader {
+    static SpruceLoader getInstance() {
+        return Companion.getInstance();
+    }
+}
+
+class Companion {
+    private static final ServiceLoader<SpruceLoader> serviceLoader =
+            ServiceLoader.load(SpruceLoader.class);
+    private static SpruceLoader instance;
+
+    static SpruceLoader getInstance() {
+        if (instance == null) {
+            serviceLoader.reload();
+            instance = serviceLoader.iterator().next();
+        }
+        if (instance == null) {
+            throw new IllegalStateException("No SpruceLoader implementation found.");
+        }
+        return instance;
     }
 }

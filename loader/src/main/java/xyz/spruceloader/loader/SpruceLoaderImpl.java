@@ -16,11 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.spruceloader.loader.api.env;
+package xyz.spruceloader.loader;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Target;
+import xyz.spruceloader.loader.api.SpruceLoader;
 
-@Target({ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.FIELD})
-public @interface EnvTarget {
+/**
+ * @since 0.0.1
+ */
+public class SpruceLoaderImpl implements SpruceLoader {
 }

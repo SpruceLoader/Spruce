@@ -16,18 +16,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.spruceloader.loader.impl.launch;
-
-import xyz.spruceloader.trunk.api.ILauncherService;
+package xyz.spruceloader.loader.api.env;
 
 /**
  * @since 0.0.1
  */
-public class SpruceLauncherService implements ILauncherService {
-    @Override
-    public LauncherRunnable launchTarget(ClassLoader classLoader, String[] args) {
-        return () -> {
-            throw new UnsupportedOperationException("Unimplemented");
-        };
-    }
+public enum Environment {
+    /**
+     * The client/local game environment.
+     */
+    CLIENT,
+
+    /**
+     * The server environment.
+     */
+    SERVER,
+
+    /**
+     * Both the client and server environment.
+     * <p>
+     * Note that this is not to be used in {@link EnvTarget} as it would make no
+     * practical sense.
+     */
+    BOTH,
 }

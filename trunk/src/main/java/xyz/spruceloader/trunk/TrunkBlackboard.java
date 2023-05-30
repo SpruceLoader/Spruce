@@ -16,12 +16,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.spruceloader.loader.impl;
+package xyz.spruceloader.trunk;
 
-import xyz.spruceloader.loader.api.SpruceLoader;
+import xyz.spruceloader.trunk.api.IBlackboard;
+
+import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * @since 0.0.1
  */
-public class SpruceLoaderImpl implements SpruceLoader {
+public class TrunkBlackboard implements IBlackboard {
+    @Override
+    public <T> Optional<T> get(Key<T> key) {
+        return Optional.empty();
+    }
+
+    @Override
+    public <T> void computeIfAbsent(Key<T> key, Function<? super Key<T>, ? extends T> valueSupplier) {
+
+    }
 }

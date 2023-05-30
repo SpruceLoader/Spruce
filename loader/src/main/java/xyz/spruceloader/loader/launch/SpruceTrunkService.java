@@ -16,26 +16,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.spruceloader.loader.api;
+package xyz.spruceloader.loader.launch;
 
-import xyz.spruceloader.loader.impl.SpruceLoaderImpl;
+import org.jetbrains.annotations.NotNull;
+import xyz.spruceloader.trunk.api.ITrunkService;
+import xyz.spruceloader.trunk.api.transform.ITransformationService;
 
 /**
  * @since 0.0.1
  */
-public interface SpruceLoader {
-    static SpruceLoader getInstance() {
-        return Companion.getInstance();
-    }
-}
+public class SpruceTrunkService implements ITrunkService {
+    @Override
+    public void initialize(@NotNull ITransformationService transformationService) {
 
-class Companion {
-    private static SpruceLoader instance;
-
-    static SpruceLoader getInstance() {
-        if (instance == null) {
-            instance = new SpruceLoaderImpl();
-        }
-        return instance;
     }
 }

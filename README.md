@@ -31,7 +31,7 @@ Please try to follow the code style used in the project, make sure to test your 
 
 <div align="center">
 
-**This project is licensed under [LGPL-3.0][lgpl3].**\
+**This project is licensed under [LGPL-3.0][lgpl3], unless files denoted otherwise.**\
 **&copy; 2022 SpruceLoader & Contributors.**
 
 </div>

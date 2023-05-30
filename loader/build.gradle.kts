@@ -1,3 +1,3 @@
 dependencies {
-    implementation(project(":trunk"))
+    implementation(project(":trunk", configuration = "archives")) // "archives" to include the api jar
 }

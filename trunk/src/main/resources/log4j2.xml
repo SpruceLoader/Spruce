@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="stdout" target="SYSTEM_OUT">
+            <PatternLayout pattern="%style{[%d{HH:mm:ss}]}{blue} %highlight{[%t/%level]}{FATAL=red,ERROR=red,WARN=yellow,INFO=green,DEBUG=green,TRACE=black} %style{(%logger{1}%notEmpty{/%markerSimpleName})}{cyan} %highlight{%msg{nolookups}%n}{FATAL=red,ERROR=red,WARN=normal,INFO=normal,DEBUG=normal,TRACE=black}"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Root level="all">
+            <AppenderRef ref="stdout" level="${sys:spruce.log.level:-info}"/>
+        </Root>
+    </Loggers>
+</Configuration>
